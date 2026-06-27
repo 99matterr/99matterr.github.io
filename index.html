@@ -65,14 +65,15 @@
             font-size: 1.1rem;
         }
 
-        /* Portfolio Grid */
+        /* Centered Portfolio Grid */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             width: 100%;
-            max-width: 1000px;
-            margin-bottom: 4rem;
+            max-width: 1050px;
+            margin: 0 auto 4rem auto;
+            justify-content: center;
         }
 
         /* Card Styling */
@@ -86,14 +87,17 @@
             transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            height: 220px;
+            min-height: 250px;
         }
 
         .portfolio-card:hover {
             transform: translateY(-5px) scale(var(--hover-scale));
             border-color: var(--accent);
             box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.1);
+        }
+
+        .card-content {
+            width: 100%;
         }
 
         .card-content h2 {
@@ -107,12 +111,16 @@
             font-size: 0.95rem;
         }
 
+        /* Arrow Absolute Bottom Baseline Alignment Fix */
         .card-link-arrow {
+            margin-top: auto; 
             align-self: flex-end;
             color: var(--accent);
             font-weight: bold;
             font-size: 1.2rem;
             transition: transform 0.2s ease;
+            line-height: 1;
+            padding-top: 1rem;
         }
 
         .portfolio-card:hover .card-link-arrow {
@@ -132,12 +140,11 @@
 
     <header>
         <span class="eyebrow">Gabriel Vasquez</span>
-        <h1>Porfolio</h1>
+        <h1>Portfolio</h1>
         <p>A central collection of specialized projects, environments, and tracking dashboards.</p>
     </header>
 
     <main class="grid-container">
-        <!-- Tennis Portfolio Card -->
         <a href="https://99matterr.github.io/Tennis-portfolio/index.html" class="portfolio-card" target="_blank">
             <div class="card-content">
                 <h2>Tennis Portfolio</h2>
@@ -146,17 +153,15 @@
             <div class="card-link-arrow">&rarr;</div>
         </a>
 
-        <!-- Trading Portfolio Card -->
-        <a href="#" class="portfolio-card">
+        <a href="https://99matterr.github.io/Macro-trading-hub/" class="portfolio-card" target="_blank">
             <div class="card-content">
-                <h2>Macro & Trading Hub</h2>
-                <p>Analysis of global economic indicators, currency pair breakdowns, and market execution strategies.</p>
+                <h2>Kairos Global Research</h2>
+                <p>An institutional-grade terminal cockpit for cross-asset liquidity tracking, macro feeds, and technical analysis.</p>
             </div>
             <div class="card-link-arrow">&rarr;</div>
         </a>
 
-        <!-- Websites Portfolio Card -->
-        <a href="#" class="portfolio-card">
+        <a href="https://99matterr.github.io/web-development-projects/" class="portfolio-card" target="_blank">
             <div class="card-content">
                 <h2>Web Development</h2>
                 <p>A showcase of clean UI/UX code architectures, script automation, and web applications.</p>
