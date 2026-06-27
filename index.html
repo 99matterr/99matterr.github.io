@@ -237,4 +237,216 @@
                 readTime: "9 MIN READ",
                 date: "JUN 22, 2026",
                 summary: "Isolating asymmetric trading bands ahead of macroeconomic policy shifts using option volatility metrics.",
-                markdown: `# Asymmetric Volatility Modeling Across Central Bank Pivots\n\n## Regime Parameterization\nOptions matrices pricing distributions often show heavy skew variations prior to high-impact economic prints or policy updates.\n\n### Volatility Smile Dynamics\nBy extracting data across multi-strike setups, we can accurately track
+                markdown: `# Asymmetric Volatility Modeling Across Central Bank Pivots\n\n## Regime Parameterization\nOptions matrices pricing distributions often show heavy skew variations prior to high-impact economic prints or policy updates.\n\n### Volatility Smile Dynamics\nBy extracting data across multi-strike setups, we can accurately track directional biases inside the institutional workspace:\n\n1.  **Call Skew Superiority:** Signals speculative spot accumulation plays across primary dealers.\n2.  **Put Implied Dominance:** Indicates massive macro delta hedging configurations are locking in asset baselines.\n\nUse this information alongside macroeconomic data lines to position risk ahead of major market moves.`
+            }
+        ];
+
+        const KAIROS_ACADEMY_DATABASE = [
+            {
+                id: "acad-01",
+                moduleCode: "VOL_01",
+                track: "FOUNDATIONS",
+                title: "Systematic Capital Allocation & Variance Positioning Models",
+                description: "A complete framework for managing risk parameters, size controls, and portfolio variance parameters.",
+                markdown: `# Systematic Capital Allocation Models\n\n## Core Position Sizing Methodology\nTo preserve risk allocation parameters under heavy tail-risk conditions, we use fixed variance controls across our positions.\n\n### The Position Dimension Formulation\nPosition sizes are mathematically determined by scaling target portfolio risk allocations against asset historical variance:\n\n\`\`\`text\nPosition Size = (Target Portfolio Risk Coefficient) / (Asset Historical Rolling Variance)\n\`\`\`\n\n* This approach automatically scales back exposure sizes when market conditions turn highly volatile.\n* It preserves performance metrics and prevents catastrophic losses during unexpected regime shifts.\n\n### Milestone Checklist\n* Identify rolling 22-day historical standard deviation levels.\n* Set absolute portfolio failure thresholds at 1.5% max capital impact.\n* Execute structural position adjustments across changing volatility environments.`
+            },
+            {
+                id: "acad-02",
+                moduleCode: "VOL_02",
+                track: "ADVANCED STRATEGY",
+                title: "Cross-Market Yield Correlations & Interest Rate Pipeline Mapping",
+                description: "Master tracking methods for analyzing inter-market bond spread frameworks to anticipate major equity index movements.",
+                markdown: `# Interest Rate Pipeline Mapping\n\n## Inter-Market Treasury Spread Analysis\nSovereign bond yield differentials serve as a primary macro driver for cross-border capital reallocation patterns.\n\n### Yield Curves as Forward Indicators\nWhen short-term bond yields exceed long-term payouts, the resulting inversion signals cooling macro conditions. Track these adjustments closely to help structure risk management plans ahead of structural market realignments.`
+            }
+        ];
+
+        // ================= RETRIEVED STATE PERSISTENCE HOOKS =================
+        let activeView = localStorage.getItem('kairos_view') || 'terminal';
+        let activeLayout = localStorage.getItem('kairos_layout') || 'single';
+        let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules')) || [];
+
+        // ================= ROUTER CONTROLLERS =================
+        function switchView(viewName) {
+            activeView = viewName;
+            localStorage.setItem('kairos_view', viewName);
+            
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('nav border-b button').forEach(b => b.classList.remove('active-tab'));
+            
+            // Sync fallback navigation link styles manually
+            document.querySelectorAll('nav button').forEach(btn => {
+                if(btn.id === `tab-${viewName}`) btn.classList.add('active-tab');
+                else btn.classList.remove('active-tab');
+            });
+            
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            
+            const titleMap = {
+                'terminal': 'Live Market Workspace',
+                'blog': 'Systematic Intelligence Pipeline',
+                'academy': 'Systematic Training Modules'
+            };
+            document.getElementById('current-view-title').textContent = titleMap[viewName];
+            
+            const layoutTools = document.getElementById('workspace-layout-controls');
+            if(viewName === 'terminal') {
+                layoutTools.style.opacity = '1';
+                layoutTools.style.pointerEvents = 'auto';
+                initTradingViewWorkspace();
+            } else {
+                layoutTools.style.opacity = '0';
+                layoutTools.style.pointerEvents = 'none';
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setLayout(layoutFormat) {
+            activeLayout = layoutFormat;
+            localStorage.setItem('kairos_layout', layoutFormat);
+            
+            const slotB = document.getElementById('tv-canvas-slot-b-holder');
+            const gridContainer = document.getElementById('chart-workspace-container');
+            const btnSingle = document.getElementById('layout-btn-single');
+            const btnSplit = document.getElementById('layout-btn-split');
+            
+            btnSingle.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
+            btnSplit.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
+
+            if(layoutFormat === 'split') {
+                gridContainer.classList.replace('grid-cols-1', 'grid-cols-2');
+                slotB.classList.remove('hidden');
+                btnSplit.classList.add('bg-zinc-900', 'text-cyan-400', 'border', 'border-zinc-800');
+            } else {
+                gridContainer.classList.replace('grid-cols-2', 'grid-cols-1');
+                slotB.classList.add('hidden');
+                btnSingle.classList.add('bg-zinc-900', 'text-cyan-400', 'border', 'border-zinc-800');
+            }
+            
+            initTradingViewWorkspace();
+        }
+
+        // ================= TRADINGVIEW WIDGET INSTANTIATION =================
+        function initTradingViewWorkspace() {
+            // Confirm container element states are clear before initialization passes
+            const slotAContainer = document.getElementById('tv-canvas-slot-a');
+            const slotBContainer = document.getElementById('tv-canvas-slot-b');
+            
+            if(!slotAContainer) return;
+            slotAContainer.innerHTML = '';
+            slotBContainer.innerHTML = '';
+
+            new TradingView.widget({
+                "width": "100%", "height": "100%", "symbol": "FX:EURUSD",
+                "interval": "240", "timezone": "Etc/UTC", "theme": "dark",
+                "style": "1", "locale": "en", "container_id": "tv-canvas-slot-a",
+                "backgroundColor": "#08080c", "gridColor": "rgba(24, 24, 27, 0.4)"
+            });
+
+            if(activeLayout === 'split') {
+                new TradingView.widget({
+                    "width": "100%", "height": "100%", "symbol": "TVC:US10Y",
+                    "interval": "D", "timezone": "Etc/UTC", "theme": "dark",
+                    "style": "1", "locale": "en", "container_id": "tv-canvas-slot-b",
+                    "backgroundColor": "#08080c", "gridColor": "rgba(24, 24, 27, 0.4)"
+                });
+            }
+        }
+
+        // ================= RENDERING LOOPS =================
+        function compileAndOpenDocument(type, id) {
+            const database = type === 'blog' ? KAIROS_BLOG_DATABASE : KAIROS_ACADEMY_DATABASE;
+            const doc = database.find(item => item.id === id);
+            if(!doc) return;
+
+            document.getElementById('modal-badge').textContent = type === 'blog' ? `RESEARCH // ${doc.category}` : `ACADEMY // ${doc.moduleCode}`;
+            document.getElementById('markdown-reader-target').innerHTML = marked.parse(doc.markdown);
+            document.getElementById('immersive-reader').style.display = 'flex';
+        }
+
+        function closeReader() {
+            document.getElementById('immersive-reader').style.display = 'none';
+        }
+
+        function toggleModuleMilestone(id, event) {
+            event.stopPropagation();
+            if(completedModules.includes(id)) {
+                completedModules = completedModules.filter(mId => mId !== id);
+            } else {
+                completedModules.push(id);
+            }
+            localStorage.setItem('kairos_completed_modules', JSON.stringify(completedModules));
+            renderAcademyDomElements();
+            calculateProgressMetrics();
+        }
+
+        function calculateProgressMetrics() {
+            const totalModules = KAIROS_ACADEMY_DATABASE.length;
+            if(totalModules === 0) return;
+            const ratio = Math.round((completedModules.length / totalModules) * 100);
+            document.getElementById('portal-progress-metric').textContent = `${ratio}% COMPLETE`;
+        }
+
+        function renderPublicationsFeed() {
+            document.getElementById('blog-posts-grid').innerHTML = KAIROS_BLOG_DATABASE.map(post => `
+                <article onclick="compileAndOpenDocument('blog', '${post.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 transition-all rounded-xl p-6 flex flex-col justify-between cursor-pointer group">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center font-mono text-[10px]">
+                            <span class="text-amber-500 font-bold tracking-wider">${post.category}</span>
+                            <span class="text-zinc-500">${post.readTime}</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white group-hover:text-cyan-400 transition-colors tracking-tight font-mono">${post.title}</h3>
+                        <p class="text-xs text-zinc-400 leading-relaxed">${post.summary}</p>
+                    </div>
+                    <div class="flex items-center justify-between font-mono text-[10px] text-zinc-600 border-t border-zinc-900 pt-3 mt-4">
+                        <span>KAIROS OBSERVER</span>
+                        <span>${post.date}</span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function renderAcademyDomElements() {
+            document.getElementById('academy-modules-stack').innerHTML = KAIROS_ACADEMY_DATABASE.map(mod => {
+                const isFinished = completedModules.includes(mod.id);
+                return `
+                    <div onclick="compileAndOpenDocument('academy', '${mod.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all cursor-pointer group">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-3 font-mono text-[10px]">
+                                <span class="px-2 py-0.5 rounded bg-zinc-950 border border-zinc-900 text-zinc-400 font-bold">${mod.moduleCode}</span>
+                                <span class="text-emerald-500 uppercase tracking-wider font-semibold">${mod.track}</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-white tracking-tight font-mono group-hover:text-emerald-400 transition-colors">${mod.title}</h4>
+                            <p class="text-xs text-zinc-400 max-w-3xl">${mod.description}</p>
+                        </div>
+                        <button onclick="toggleModuleMilestone('${mod.id}', event)" class="px-3 py-1.5 border font-mono text-[10px] rounded-lg transition-all cursor-pointer ${
+                            isFinished 
+                            ? 'bg-emerald-950/20 text-emerald-400 border-emerald-500/30 font-bold' 
+                            : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-zinc-600'
+                        }">
+                            ${isFinished ? '✓ SECURED' : 'MARK COMPLETE'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ================= GLOBAL PLATFORM RUNTIMES =================
+        window.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeReader(); });
+        
+        setInterval(() => {
+            const timeSpan = document.getElementById('live-time');
+            if(timeSpan) timeSpan.textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+        }, 1000);
+
+        // Core system startup sequence
+        renderPublicationsFeed();
+        renderAcademyDomElements();
+        calculateProgressMetrics();
+        
+        // Execute dynamic layout restoring matches
+        switchView(activeView);
+        setLayout(activeLayout);
+    </script>
+</body>
+</html>
