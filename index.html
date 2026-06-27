@@ -3,20 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIROS GLOBAL RESEARCH</title>
+    <title>KAIROS GLOBAL RESEARCH // SYSTEM SUITE</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Modern Obsidian Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        /* Modern Obsidian Design Token Resets */
+        body { background-color: #020203; color: #d4d4d8; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #020203; }
-        ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #18181b; border-radius: 2px; }
         ::-webkit-scrollbar-thumb:hover { background: #27272a; }
         
         .active-tab {
             color: #06b6d4;
             border-bottom: 2px solid #06b6d4;
         }
+        
+        /* Markdown Renderer Custom Typographic Layout Rules */
+        .prose-content h1 { font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: monospace; tracking-tight: -0.02em; }
+        .prose-content h2 { font-size: 1.05rem; font-weight: 700; color: #f4f4f5; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: monospace; }
+        .prose-content p { font-size: 0.85rem; color: #a1a1aa; line-height: 1.6; margin-bottom: 0.85rem; }
+        .prose-content code { background: #09090e; border: 1px solid #1e1e2f; padding: 0.15rem 0.3rem; border-radius: 3px; font-family: monospace; font-size: 0.75rem; color: #e11d48; }
+        .prose-content pre { background: #040406; border: 1px solid #12121c; padding: 1rem; border-radius: 6px; overflow-x: auto; margin: 1rem 0; }
+        .prose-content pre code { background: transparent; border: none; padding: 0; color: #e4e4e7; }
+        .prose-content ul { list-style-type: square; padding-left: 1.25rem; margin-bottom: 1rem; font-size: 0.85rem; color: #a1a1aa; }
     </style>
 </head>
 <body class="bg-[#020203] text-zinc-300 font-sans antialiased min-h-screen flex flex-col justify-between">
@@ -41,8 +51,13 @@
         </div>
 
         <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
-            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums">UTC --:--:--</span>
-            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div id="workspace-layout-controls" class="flex border border-zinc-800 rounded p-0.5 bg-[#020203] transition-all">
+                <button onclick="setLayout('single')" id="layout-btn-single" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold">Single view</button>
+                <button onclick="setLayout('split')" id="layout-btn-split" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold">Split Workspace</button>
+            </div>
+            <div class="h-4 w-px bg-zinc-800 hidden sm:block"></div>
+            <span id="live-time" class="text-zinc-400 font-semibold tabular-nums hidden sm:inline">UTC --:--:--</span>
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
         </div>
     </nav>
 
@@ -52,29 +67,33 @@
         <button onclick="switchView('academy')" class="text-zinc-400 hover:text-white">Academy</button>
     </div>
 
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex-grow w-full">
         
-        <div id="view-terminal" class="view-panel space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
-                <div class="bg-[#08080c] border border-zinc-900 rounded-lg p-4">
-                    <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US Dollar Index (DXY)</div>
-                    <div class="text-lg font-bold text-white mt-1 tabular-nums">101.24 <span class="text-xs text-red-500 font-normal ml-2">-0.14%</span></div>
-                </div>
-                <div class="bg-[#08080c] border border-zinc-900 rounded-lg p-4">
-                    <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US 10Y Treasury Yield</div>
-                    <div class="text-lg font-bold text-white mt-1 tabular-nums">4.118% <span class="text-xs text-emerald-500 font-normal ml-2">+0.62%</span></div>
-                </div>
-                <div class="bg-[#08080c] border border-zinc-900 rounded-lg p-4">
-                    <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Academy Milestone Progress</div>
-                    <div id="portal-progress-metric" class="text-lg font-bold text-cyan-400 mt-1 tabular-nums">0% COMPLETE</div>
+        <div id="view-terminal" class="view-panel transition-all duration-150">
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
+                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US Dollar Index (DXY)</div>
+                        <div class="text-base font-bold text-white mt-1 tabular-nums">101.24 <span class="text-xs text-red-500 font-normal ml-2">-0.14%</span></div>
+                    </div>
+                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US 10Y Treasury Yield</div>
+                        <div class="text-base font-bold text-white mt-1 tabular-nums">4.118% <span class="text-xs text-emerald-500 font-normal ml-2">+0.62%</span></div>
+                    </div>
+                    <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
+                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Quant Academy Index Progress</div>
+                        <div id="portal-progress-metric" class="text-base font-bold text-cyan-400 mt-1 tabular-nums">0% COMPLETE</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden flex flex-col h-[480px]">
-                <div class="p-3.5 bg-[#0b0b10] border-b border-zinc-900 font-mono text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                    Institutional Macro Catalyst Feed
+            <div class="w-full bg-[#08080c] border-y border-zinc-900 my-6 flex flex-col h-[480px]">
+                <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex justify-between items-center shrink-0">
+                    <span>Institutional Macro Catalyst Feed</span>
+                    <span class="text-cyan-500 font-normal text-[9px]">// RUNNING EDGE WEB FEED INTEGRATION</span>
                 </div>
-                <div class="flex-grow relative bg-[#020203]">
+                <div class="flex-grow relative border-t border-zinc-900 bg-[#020203]">
                     <div class="tradingview-widget-container h-full">
                         <div class="tradingview-widget-container__widget h-full"></div>
                         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
@@ -87,12 +106,57 @@
                 </div>
             </div>
 
-            <div class="bg-[#08080c] border border-zinc-900 rounded-xl overflow-hidden h-[600px] p-1">
-                <div id="tv-fluid-chart-wrapper" class="w-full h-full rounded-lg overflow-hidden"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6 pb-12">
+                <div class="lg:col-span-8 flex flex-col gap-4">
+                    <div id="chart-workspace-container" class="grid grid-cols-1 gap-4 h-[580px] w-full">
+                        <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 flex flex-col relative h-full w-full">
+                            <div id="tv-canvas-slot-a" class="w-full h-full rounded-lg overflow-hidden"></div>
+                        </div>
+                        <div id="tv-canvas-slot-b-holder" class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 flex flex-col relative h-full w-full hidden">
+                            <div id="tv-canvas-slot-b" class="w-full h-full rounded-lg overflow-hidden"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 bg-[#08080c] border border-zinc-900 rounded-xl p-5 flex flex-col h-auto lg:h-[580px] justify-between">
+                    <div class="w-full">
+                        <div class="font-mono text-xs font-bold tracking-wider uppercase text-zinc-300 border-b border-zinc-900 pb-2 mb-4 flex items-center justify-between">
+                            <span>Tactical Workspace Log</span>
+                            <span class="text-zinc-600 font-normal text-[10px]">v2.2</span>
+                        </div>
+                        
+                        <form id="workspace-form" class="space-y-4 text-xs font-mono">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-zinc-500 mb-1 text-[10px]">PAIR / ASSET</label>
+                                    <input type="text" placeholder="e.g., GBPJPY" class="w-full bg-[#030305] border border-zinc-900 rounded px-2.5 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 transition-colors uppercase font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-zinc-500 mb-1 text-[10px]">EXECUTION BIAS</label>
+                                    <select class="w-full bg-[#030305] border border-zinc-900 rounded px-2 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 transition-colors font-semibold">
+                                        <option class="text-red-400">SHORT / SELL</option>
+                                        <option class="text-emerald-400">LONG / BUY</option>
+                                        <option class="text-zinc-400">NEUTRAL / WATCH</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-zinc-500 mb-1 text-[10px]">MACRO REGIME REGULATOR THESIS</label>
+                                <textarea rows="6" placeholder="Identify monetary divergence models, swap anomalies, or incoming central bank catalyst parameters mapping structural asymmetry entries..." class="w-full bg-[#030305] border border-zinc-900 rounded px-2.5 py-2 text-zinc-200 focus:outline-none focus:border-cyan-500 transition-colors resize-none leading-relaxed text-xs"></textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                    <button type="button" class="w-full bg-zinc-900 border border-zinc-800 hover:border-cyan-500/40 text-zinc-300 hover:text-cyan-400 transition-all rounded-lg py-2.5 text-xs font-mono tracking-wider font-medium cursor-pointer mt-6">
+                        LOCK CONTEXT LOG ENTRY
+                    </button>
+                </div>
             </div>
+
         </div>
 
-        <div id="view-blog" class="view-panel space-y-6 hidden">
+        <div id="view-blog" class="view-panel space-y-6 hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="border-b border-zinc-900 pb-4 font-mono">
                 <h2 class="text-lg font-bold text-white uppercase tracking-wider">Boutique Intelligence Logs</h2>
                 <p class="text-sm text-zinc-500 mt-1">Cross-border flow matrices and central bank liquidity breakdowns.</p>
@@ -100,7 +164,7 @@
             <div id="blog-posts-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </div>
 
-        <div id="view-academy" class="view-panel space-y-6 hidden">
+        <div id="view-academy" class="view-panel space-y-6 hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="border-b border-zinc-900 pb-4 font-mono">
                 <h2 class="text-lg font-bold text-white uppercase tracking-wider">Quantitative Allocation Frameworks</h2>
                 <p class="text-sm text-zinc-500 mt-1">Structured modules exploring statistical variance management and position geometry.</p>
@@ -108,9 +172,9 @@
             <div id="academy-modules-stack" class="space-y-4"></div>
         </div>
 
-    </main>
+    </div>
 
-    <footer class="bg-[#060608] border-t border-zinc-900 mt-12 py-12 px-4 font-mono text-xs text-zinc-500 select-none">
+    <footer class="bg-[#060608] border-t border-zinc-900 py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
         <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div class="space-y-3">
                 <p class="text-zinc-300 font-bold tracking-wider uppercase">Kairos Global Research</p>
@@ -121,9 +185,9 @@
             <div class="space-y-2">
                 <p class="text-zinc-400 font-bold uppercase tracking-wider">Portal Core Navigation</p>
                 <ul class="space-y-1 text-[11px]">
-                    <li><button onclick="switchView('terminal')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer">Live Analytics Console</button></li>
-                    <li><button onclick="switchView('blog')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer">Macro Intelligence Logs</button></li>
-                    <li><button onclick="switchView('academy')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer">Systematic Course Workspace</button></li>
+                    <li><button onclick="switchView('terminal')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer text-left">Live Analytics Console</button></li>
+                    <li><button onclick="switchView('blog')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer text-left">Macro Intelligence Logs</button></li>
+                    <li><button onclick="switchView('academy')" class="text-zinc-500 hover:text-cyan-400 transition-colors cursor-pointer text-left">Systematic Course Workspace</button></li>
                 </ul>
             </div>
             <div class="space-y-2">
@@ -131,7 +195,7 @@
                 <div class="text-[11px] space-y-1 text-zinc-500 uppercase">
                     <div>Interface Protocol: <span class="text-zinc-400">HTTPS / STATIC WIDGET EDGE</span></div>
                     <div>Data Status: <span class="text-emerald-500 font-bold">NOMINAL / STABLE</span></div>
-                    <div>Deployment: <span class="text-zinc-400">GitHub Pages v2.2</span></div>
+                    <div>Deployment Grid: <span class="text-zinc-400">GitHub Pages v2.2</span></div>
                 </div>
             </div>
         </div>
@@ -147,7 +211,7 @@
                 <span id="modal-badge" class="font-mono text-[9px] text-cyan-400 font-bold tracking-widest border border-cyan-500/20 px-2 py-0.5 rounded bg-cyan-500/5">INTEL_LOG</span>
                 <button onclick="closeReader()" class="text-zinc-500 hover:text-white font-mono text-xs bg-zinc-950 border border-zinc-900 px-2 py-1 rounded cursor-pointer transition-colors">CLOSE [ESC]</button>
             </div>
-            <div class="p-6 overflow-y-auto max-w-none border-t border-zinc-900/40" style="font-family: inherit;">
+            <div class="p-6 overflow-y-auto max-w-none border-t border-zinc-900/40">
                 <div id="markdown-reader-target" class="text-zinc-300 space-y-4 prose-content"></div>
             </div>
         </div>
@@ -155,7 +219,7 @@
 
     <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // ================= INTERNAL DATA CORES =================
+        // ================= FULL RESTORED DATA CORES =================
         const KAIROS_BLOG_DATABASE = [
             {
                 id: "blog-01",
@@ -173,37 +237,4 @@
                 readTime: "9 MIN READ",
                 date: "JUN 22, 2026",
                 summary: "Isolating asymmetric trading bands ahead of macroeconomic policy shifts using option volatility metrics.",
-                markdown: `# Asymmetric Volatility Modeling Across Central Bank Pivots\n\n## Regime Parameterization\nOptions matrices pricing distributions often show heavy skew variations prior to high-impact economic prints or policy updates.\n\n### Volatility Smile Dynamics\nBy extracting data across multi-strike setups, we can accurately track directional biases inside the institutional workspace:\n\n1.  **Call Skew Superiority:** Signals speculative spot accumulation plays across primary dealers.\n2.  **Put Implied Dominance:** Indicates massive macro delta hedging configurations are locking in asset baselines.\n\nUse this information alongside macroeconomic data lines to position risk ahead of major market moves.`
-            }
-        ];
-
-        const KAIROS_ACADEMY_DATABASE = [
-            {
-                id: "acad-01",
-                moduleCode: "VOL_01",
-                track: "FOUNDATIONS",
-                title: "Systematic Capital Allocation & Variance Positioning Models",
-                description: "A complete framework for managing risk parameters, size controls, and portfolio variance parameters.",
-                markdown: `# Systematic Capital Allocation Models\n\n## Core Position Sizing Methodology\nTo preserve risk allocation parameters under heavy tail-risk conditions, we use fixed variance controls across our positions.\n\n### The Position Dimension Formulation\nPosition sizes are mathematically determined by scaling target portfolio risk allocations against asset historical variance:\n\n\`\`\`text\nPosition Size = (Target Portfolio Risk Coefficient) / (Asset Historical Rolling Variance)\n\`\`\`\n\n* This approach automatically scales back exposure sizes when market conditions turn highly volatile.\n* It preserves performance metrics and prevents catastrophic losses during unexpected regime shifts.\n\n### Milestone Checklist\n* Identify rolling 22-day historical standard deviation levels.\n* Set absolute portfolio failure thresholds at 1.5% max capital impact.\n* Execute structural position adjustments across changing volatility environments.`
-            },
-            {
-                id: "acad-02",
-                moduleCode: "VOL_02",
-                track: "ADVANCED STRATEGY",
-                title: "Cross-Market Yield Correlations & Interest Rate Pipeline Mapping",
-                description: "Master tracking methods for analyzing inter-market bond spread frameworks to anticipate major equity index movements.",
-                markdown: `# Interest Rate Pipeline Mapping\n\n## Inter-Market Treasury Spread Analysis\nSovereign bond yield differentials serve as a primary macro driver for cross-border capital reallocation patterns.\n\n### Yield Curves as Forward Indicators\nWhen short-term bond yields exceed long-term payouts, the resulting inversion signals cooling macro conditions. Track these adjustments closely to help structure risk management plans ahead of structural market realignments.`
-            }
-        ];
-
-        // ================= STATE ENGINE HOOKS =================
-        let activeView = localStorage.getItem('kairos_view') || 'terminal';
-        let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules')) || [];
-
-        // ================= INTERACTION CONTROLLERS =================
-        function switchView(viewName) {
-            activeView = viewName;
-            localStorage.setItem('kairos_view', viewName);
-            
-            // Toggle visibility classes smoothly
-            document.querySelectorAll('.view-panel').forEach(p => p.classList.
+                markdown: `# Asymmetric Volatility Modeling Across Central Bank Pivots\n\n## Regime Parameterization\nOptions matrices pricing distributions often show heavy skew variations prior to high-impact economic prints or policy updates.\n\n### Volatility Smile Dynamics\nBy extracting data across multi-strike setups, we can accurately track
