@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAIROS GLOBAL RESEARCH // SYSTEM SUITE</title>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -20,7 +21,7 @@
         }
         
         /* Markdown Renderer Custom Typographic Layout Rules */
-        .prose-content h1 { font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: monospace; tracking-tight: -0.02em; }
+        .prose-content h1 { font-size: 1.3rem; font-weight: 700; color: #ffffff; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: monospace; }
         .prose-content h2 { font-size: 1.05rem; font-weight: 700; color: #f4f4f5; margin-top: 1.25rem; margin-bottom: 0.5rem; font-family: monospace; }
         .prose-content p { font-size: 0.85rem; color: #a1a1aa; line-height: 1.6; margin-bottom: 0.85rem; }
         .prose-content code { background: #09090e; border: 1px solid #1e1e2f; padding: 0.15rem 0.3rem; border-radius: 3px; font-family: monospace; font-size: 0.75rem; color: #e11d48; }
@@ -52,8 +53,8 @@
 
         <div class="font-mono text-xs text-zinc-500 flex items-center gap-4">
             <div id="workspace-layout-controls" class="flex border border-zinc-800 rounded p-0.5 bg-[#020203] transition-all">
-                <button onclick="setLayout('single')" id="layout-btn-single" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold">Single view</button>
-                <button onclick="setLayout('split')" id="layout-btn-split" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold">Split Workspace</button>
+                <button onclick="setLayout('single')" id="layout-btn-single" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold bg-zinc-900 text-cyan-400 border border-zinc-800">Single view</button>
+                <button onclick="setLayout('split')" id="layout-btn-split" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300">Split Workspace</button>
             </div>
             <div class="h-4 w-px bg-zinc-800 hidden sm:block"></div>
             <span id="live-time" class="text-zinc-400 font-semibold tabular-nums hidden sm:inline">UTC --:--:--</span>
@@ -67,11 +68,11 @@
         <button onclick="switchView('academy')" class="text-zinc-400 hover:text-white">Academy</button>
     </div>
 
-    <div class="flex-grow w-full">
+    <main class="flex-grow w-full">
         
         <div id="view-terminal" class="view-panel transition-all duration-150">
             
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
                     <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
                         <div class="text-[10px] text-zinc-500 uppercase tracking-wider">US Dollar Index (DXY)</div>
@@ -82,7 +83,7 @@
                         <div class="text-base font-bold text-white mt-1 tabular-nums">4.118% <span class="text-xs text-emerald-500 font-normal ml-2">+0.62%</span></div>
                     </div>
                     <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-4">
-                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Quant Academy Index Progress</div>
+                        <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Quant Academy Progress</div>
                         <div id="portal-progress-metric" class="text-base font-bold text-cyan-400 mt-1 tabular-nums">0% COMPLETE</div>
                     </div>
                 </div>
@@ -91,7 +92,7 @@
             <div class="w-full bg-[#08080c] border-y border-zinc-900 my-6 flex flex-col h-[480px]">
                 <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex justify-between items-center shrink-0">
                     <span>Institutional Macro Catalyst Feed</span>
-                    <span class="text-cyan-500 font-normal text-[9px]">// RUNNING EDGE WEB FEED INTEGRATION</span>
+                    <span class="text-cyan-500 font-normal text-[9px]">// REAL-TIME WEB SOCKET PIPELINE</span>
                 </div>
                 <div class="flex-grow relative border-t border-zinc-900 bg-[#020203]">
                     <div class="tradingview-widget-container h-full">
@@ -107,7 +108,8 @@
             </div>
 
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6 pb-12">
-                <div class="lg:col-span-8 flex flex-col gap-4">
+                
+                <div class="lg:col-span-8 flex flex-col">
                     <div id="chart-workspace-container" class="grid grid-cols-1 gap-4 h-[580px] w-full">
                         <div class="bg-[#08080c] border border-zinc-900 rounded-xl p-1 flex flex-col relative h-full w-full">
                             <div id="tv-canvas-slot-a" class="w-full h-full rounded-lg overflow-hidden"></div>
@@ -152,8 +154,8 @@
                         LOCK CONTEXT LOG ENTRY
                     </button>
                 </div>
-            </div>
 
+            </div>
         </div>
 
         <div id="view-blog" class="view-panel space-y-6 hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -172,7 +174,7 @@
             <div id="academy-modules-stack" class="space-y-4"></div>
         </div>
 
-    </div>
+    </main>
 
     <footer class="bg-[#060608] border-t border-zinc-900 py-12 px-4 font-mono text-xs text-zinc-500 select-none w-full shrink-0">
         <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
@@ -217,9 +219,8 @@
         </div>
     </div>
 
-    <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // ================= FULL RESTORED DATA CORES =================
+        // ================= QUANT RAW DATABASE CORES =================
         const KAIROS_BLOG_DATABASE = [
             {
                 id: "blog-01",
@@ -260,26 +261,27 @@
             }
         ];
 
-        // ================= RETRIEVED STATE PERSISTENCE HOOKS =================
+        // ================= RETRIEVED STATE STORAGE MAPS =================
         let activeView = localStorage.getItem('kairos_view') || 'terminal';
         let activeLayout = localStorage.getItem('kairos_layout') || 'single';
         let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules')) || [];
+        
+        let chartInstanceA = null;
+        let chartInstanceB = null;
 
-        // ================= ROUTER CONTROLLERS =================
+        // ================= CORE NAVIGATION ROUTER =================
         function switchView(viewName) {
             activeView = viewName;
             localStorage.setItem('kairos_view', viewName);
             
             document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('nav border-b button').forEach(b => b.classList.remove('active-tab'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
             
-            // Sync fallback navigation link styles manually
+            // Re-sync nav header state indicators
             document.querySelectorAll('nav button').forEach(btn => {
                 if(btn.id === `tab-${viewName}`) btn.classList.add('active-tab');
                 else btn.classList.remove('active-tab');
             });
-            
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
             
             const titleMap = {
                 'terminal': 'Live Market Workspace',
@@ -288,17 +290,17 @@
             };
             document.getElementById('current-view-title').textContent = titleMap[viewName];
             
+            // Layout controls are contextually bounded only to terminal dashboard
             const layoutTools = document.getElementById('workspace-layout-controls');
             if(viewName === 'terminal') {
                 layoutTools.style.opacity = '1';
                 layoutTools.style.pointerEvents = 'auto';
-                initTradingViewWorkspace();
+                // Trigger chart re-draw safe checks inside view states
+                if(!chartInstanceA) initTradingViewWorkspace();
             } else {
                 layoutTools.style.opacity = '0';
                 layoutTools.style.pointerEvents = 'none';
             }
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function setLayout(layoutFormat) {
@@ -323,37 +325,37 @@
                 btnSingle.classList.add('bg-zinc-900', 'text-cyan-400', 'border', 'border-zinc-800');
             }
             
+            // Re-instantiate charts on framework layout alterations
             initTradingViewWorkspace();
         }
 
-        // ================= TRADINGVIEW WIDGET INSTANTIATION =================
+        // ================= ANCHORED TRADINGVIEW INITIALIZATION =================
         function initTradingViewWorkspace() {
-            // Confirm container element states are clear before initialization passes
-            const slotAContainer = document.getElementById('tv-canvas-slot-a');
-            const slotBContainer = document.getElementById('tv-canvas-slot-b');
-            
-            if(!slotAContainer) return;
-            slotAContainer.innerHTML = '';
-            slotBContainer.innerHTML = '';
+            if (typeof TradingView === 'undefined') return;
 
-            new TradingView.widget({
+            document.getElementById('tv-canvas-slot-a').innerHTML = '';
+            document.getElementById('tv-canvas-slot-b').innerHTML = '';
+
+            chartInstanceA = new TradingView.widget({
                 "width": "100%", "height": "100%", "symbol": "FX:EURUSD",
                 "interval": "240", "timezone": "Etc/UTC", "theme": "dark",
                 "style": "1", "locale": "en", "container_id": "tv-canvas-slot-a",
-                "backgroundColor": "#08080c", "gridColor": "rgba(24, 24, 27, 0.4)"
+                "backgroundColor": "#08080c", "gridColor": "rgba(24, 24, 27, 0.4)",
+                "autosize": true
             });
 
             if(activeLayout === 'split') {
-                new TradingView.widget({
+                chartInstanceB = new TradingView.widget({
                     "width": "100%", "height": "100%", "symbol": "TVC:US10Y",
                     "interval": "D", "timezone": "Etc/UTC", "theme": "dark",
                     "style": "1", "locale": "en", "container_id": "tv-canvas-slot-b",
-                    "backgroundColor": "#08080c", "gridColor": "rgba(24, 24, 27, 0.4)"
+                    "backgroundColor": "#08080c", "gridColor": "rgba(24, 24, 27, 0.4)",
+                    "autosize": true
                 });
             }
         }
 
-        // ================= RENDERING LOOPS =================
+        // ================= RENDERING AND PROGRESS LOOPS =================
         function compileAndOpenDocument(type, id) {
             const database = type === 'blog' ? KAIROS_BLOG_DATABASE : KAIROS_ACADEMY_DATABASE;
             const doc = database.find(item => item.id === id);
@@ -431,20 +433,21 @@
             }).join('');
         }
 
-        // ================= GLOBAL PLATFORM RUNTIMES =================
+        // ================= RUNTIME PLATFORM INITIALIZATION =================
         window.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeReader(); });
         
+        // Universal clock loop ticker
         setInterval(() => {
             const timeSpan = document.getElementById('live-time');
             if(timeSpan) timeSpan.textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
         }, 1000);
 
-        // Core system startup sequence
+        // Core startup sequence execution
         renderPublicationsFeed();
         renderAcademyDomElements();
         calculateProgressMetrics();
         
-        // Execute dynamic layout restoring matches
+        // Trigger safe structural view rendering
         switchView(activeView);
         setLayout(activeLayout);
     </script>
