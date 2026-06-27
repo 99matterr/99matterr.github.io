@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAIROS // GLOBAL QUANTAMENTAL TERMINAL</title>
-    <!-- Tailwind CSS Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Marked.js Markdown Engine -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* Base Obsidian Reset */
@@ -34,10 +32,8 @@
 </head>
 <body class="font-sans antialiased select-none overflow-hidden h-screen w-screen flex">
 
-    <!-- SIDEBAR MASTER COMPONENT -->
     <aside class="w-64 border-r border-zinc-900 bg-[#060608] flex flex-col justify-between z-20 h-full shrink-0">
         <div>
-            <!-- Corporate Brand Identity Space -->
             <div class="p-5 border-b border-zinc-900 flex items-center gap-3 bg-[#030304]">
                 <div class="h-6 w-6 rounded bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
                     <span class="text-[10px] font-mono font-bold text-white">KG</span>
@@ -48,7 +44,6 @@
                 </div>
             </div>
             
-            <!-- Core Navigation Router Matrix -->
             <nav class="p-3 space-y-1 text-xs font-mono">
                 <p class="text-[9px] text-zinc-600 font-bold tracking-widest uppercase px-3 mb-2 mt-2">Workspace Desks</p>
                 <button onclick="switchView('terminal')" id="nav-terminal" class="w-full flex items-center gap-3 px-3 py-2.5 rounded text-zinc-400 hover:text-white hover:bg-zinc-900/30 transition-all text-left cursor-pointer">
@@ -68,26 +63,21 @@
             </nav>
         </div>
         
-        <!-- Local Metrics Progress Automation Window -->
         <div class="p-4 border-t border-zinc-900 font-mono text-[10px] text-zinc-500 bg-[#030304] space-y-1.5">
             <div class="flex justify-between"><span>CORE_ENGINE:</span><span class="text-emerald-500 font-bold">ACTIVE</span></div>
             <div class="flex justify-between"><span>ACADEMY_PROGRESS:</span><span id="sidebar-progress-metric" class="text-cyan-400 tabular-nums">0%</span></div>
         </div>
     </aside>
 
-    <!-- MAIN INTERFACE WINDOW HOUSING -->
-    <div class="flex-1 flex flex-col overflow-hidden h-full">
+    <div class="flex-1 flex flex-col overflow-hidden">
         
-        <!-- TERMINAL GLOBAL HEADER CONTROL LINE -->
         <header class="h-14 border-b border-zinc-900 bg-[#060608] flex items-center justify-between px-6 z-10 shrink-0">
             <div class="flex items-center gap-4 text-xs font-mono">
                 <span class="text-zinc-700">/</span>
                 <span id="current-view-title" class="text-zinc-200 uppercase tracking-widest font-bold">Live Market Workspace</span>
             </div>
             
-            <!-- Functional Interaction Row: Workspace Controls + Time System -->
             <div class="flex items-center gap-6 font-mono text-xs">
-                <!-- Workspace Format Matrix Toggles -->
                 <div id="workspace-layout-controls" class="flex border border-zinc-800 rounded p-0.5 bg-[#020203]">
                     <button onclick="setLayout('single')" id="layout-btn-single" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold">Single Canvas</button>
                     <button onclick="setLayout('split')" id="layout-btn-split" class="px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold">Split Workspace</button>
@@ -99,14 +89,11 @@
             </div>
         </header>
 
-        <!-- ROUTED DISPLAY MODULE SPACES -->
         <div class="flex-1 overflow-y-auto bg-[#020203] relative">
             
-            <!-- ================= WORKSPACE DESK 1: QUANT TERMINAL ================= -->
-            <div id="view-terminal" class="view-panel p-4 h-full grid grid-cols-1 xl:grid-cols-12 gap-4">
+            <div id="view-terminal" class="view-panel p-4 grid grid-cols-1 xl:grid-cols-12 gap-4">
                 
-                <!-- CORES REGIME METRICS CAPTURE CORRIDOR (3/12 Cols) -->
-                <div class="xl:col-span-3 bg-[#08080c] border border-zinc-900 rounded p-4 flex flex-col justify-between font-mono h-full">
+                <div class="xl:col-span-3 bg-[#08080c] border border-zinc-900 rounded p-4 flex flex-col justify-between font-mono min-h-[400px] xl:min-h-0">
                     <div>
                         <div class="flex justify-between items-center border-b border-zinc-900 pb-2 mb-3">
                             <span class="text-xs font-bold text-zinc-300 tracking-wider">LIQUIDITY_MONITOR</span>
@@ -123,15 +110,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="text-[10px] text-zinc-600 uppercase font-mono tracking-tight leading-relaxed">
+                    <div class="text-[10px] text-zinc-600 uppercase font-mono tracking-tight leading-relaxed mt-6">
                         Persistent configuration storage pipeline loaded from edge.
                     </div>
                 </div>
 
-                <!-- ANALYTICAL PRIMARY VIEWPORT STACK (9/12 Cols) -->
-                <div class="xl:col-span-9 flex flex-col gap-4 h-full">
+                <div class="xl:col-span-9 flex flex-col gap-4">
                     
-                    <!-- MACRO CHRONOLOGY EVENTS TRACKER CONTAINER -->
                     <div class="w-full bg-[#08080c] border border-zinc-900 rounded p-1 h-[480px] shrink-0 flex flex-col">
                         <div class="p-2 font-mono text-[10px] font-bold text-zinc-400 border-b border-zinc-900/80 uppercase tracking-widest">
                             Live Institutional Macro Catalyst Feed
@@ -149,13 +134,10 @@
                         </div>
                     </div>
 
-                    <!-- RE-ENGINEERED DYNAMIC DUAL CONFIGURABLE CHARTING PLATFORM ARRAYS -->
-                    <div id="chart-workspace-container" class="flex-1 grid grid-cols-1 gap-4 min-h-[400px]">
-                        <!-- Chart Workspace Slot A -->
+                    <div id="chart-workspace-container" class="grid grid-cols-1 gap-4 h-[500px]">
                         <div class="bg-[#08080c] border border-zinc-900 rounded p-1 flex flex-col relative h-full w-full">
                             <div id="tv-canvas-slot-a" class="w-full h-full rounded overflow-hidden"></div>
                         </div>
-                        <!-- Chart Workspace Slot B -->
                         <div id="tv-canvas-slot-b-holder" class="bg-[#08080c] border border-zinc-900 rounded p-1 flex flex-col relative h-full w-full hidden">
                             <div id="tv-canvas-slot-b" class="w-full h-full rounded overflow-hidden"></div>
                         </div>
@@ -164,7 +146,6 @@
                 </div>
             </div>
 
-            <!-- ================= WORKSPACE DESK 2: DYNAMIC INTEL PUBLICATIONS ================= -->
             <div id="view-blog" class="view-panel p-6 hidden max-w-5xl mx-auto space-y-6">
                 <div class="border-b border-zinc-900 pb-4 font-mono">
                     <h2 class="text-sm font-bold text-white uppercase tracking-wider">// System Intelligence Pipeline</h2>
@@ -173,7 +154,6 @@
                 <div id="blog-posts-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <!-- ================= WORKSPACE DESK 3: SYSTEMATIC QUANT ACADEMY ================= -->
             <div id="view-academy" class="view-panel p-6 hidden max-w-5xl mx-auto space-y-6">
                 <div class="border-b border-zinc-900 pb-4 font-mono">
                     <h2 class="text-sm font-bold text-white uppercase tracking-wider">// Mathematical & Structural Training Systems</h2>
@@ -184,8 +164,7 @@
             
         </div>
 
-        <!-- ================= APPLICATION BAR PINNED STATUS FOOTER ================= -->
-        <footer class="h-8 border-t border-zinc-900 bg-[#060608] flex items-center justify-between px-6 font-mono text-[10px] text-zinc-500 shrink-0 select-none">
+        <footer class="h-8 border-t border-zinc-900 bg-[#060608] flex items-center justify-between px-6 font-mono text-[10px] text-zinc-500 shrink-0 select-none z-30">
             <div class="flex items-center gap-4">
                 <span>&copy; 2026 KAIROS GLOBAL RESEARCH</span>
                 <span class="text-zinc-700">|</span>
@@ -194,7 +173,7 @@
             <div class="flex items-center gap-4">
                 <span class="text-zinc-600 hidden sm:inline">SECURE INTERFACE CONNECTION v2.2</span>
                 <span class="text-emerald-500 font-bold flex items-center gap-1">
-                    <span class="h-1 w-1 rounded-full bg-emerald-500 inline-block"></span> 
+                    <span class="h-1 w-1 rounded-full bg-emerald-500 inline-block animate-pulse"></span> 
                     SYS_NOMINAL
                 </span>
             </div>
@@ -202,7 +181,6 @@
 
     </div>
 
-    <!-- IMMERSIVE SUBSTANTIVE DOCUMENT PARSING READER INTERFACE OVERLAY -->
     <div id="immersive-reader" class="fixed inset-0 bg-[#020203]/95 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-[#08080c] border border-zinc-900 rounded max-w-3xl w-full flex flex-col max-h-[85vh] shadow-[0_0_60px_rgba(0,0,0,0.9)]">
             <div class="p-4 border-b border-zinc-900 flex justify-between items-center bg-[#050507]">
@@ -215,7 +193,6 @@
         </div>
     </div>
 
-    <!-- CORE INTEGRATED SCRIPT LOGIC FRAMEWORK MACHINE -->
     <script src="https://s3.tradingview.com/tv.js"></script>
     <script>
         // ================= INTERNAL DATA CORES =================
@@ -227,7 +204,7 @@
                 readTime: "6 MIN READ",
                 date: "JUN 26, 2026",
                 summary: "An in-depth tracking analysis of Federal Reserve swap line balances and sovereign currency pricing anomalies.",
-                markdown: `# G10 Swap Lines & Cross-Border Dollar Divergence\n\n### Structural Risk Parameters Overview\nWhen foreign institutional money managers experience severe dollar sourcing pressure, standard cross-currency basis swaps fall past historical standard deviation models.\n\n## The Core Divergence Equation\nTo identify pricing gaps across money market pipelines, we map the **Cross-Currency Basis Swap Spread** using standard structural constraints:\n\n\`\`\`text\nBasis Spread = Implied Foreign Rate - Actual Foreign Rate\n\`\`\`\n\n*   When this spread dips deeply negative, it reveals high dollar demand inside overseas wholesale banking hubs.\n*   Central bank swap interventions act as structural safety valves, capping potential volatility spikes before they bleed into spot asset exchange mechanisms.\n\n### Tactical Trading Takeaway\nTrack negative basin movements across major currency pairs. Sudden spikes signals near-term upside exhaustion loops for higher-yielding cross-assets.`
+                markdown: `# G10 Swap Lines & Cross-Border Dollar Divergence\n\n### Structural Risk Parameters Overview\nWhen foreign institutional money managers experience severe dollar sourcing pressure, standard cross-currency basis swaps fall past historical standard deviation models.\n\n## The Core Divergence Equation\nTo identify pricing gaps across money market pipelines, we map the **Cross-Currency Basis Swap Spread** using standard structural constraints:\n\n\`\`\`text\nBasis Spread = Implied Foreign Rate - Actual Foreign Rate\n\`\`\`\n\n* When this spread dips deeply negative, it reveals high dollar demand inside overseas wholesale banking hubs.\n* Central bank swap interventions act as structural safety valves, capping potential volatility spikes before they bleed into spot asset exchange mechanisms.\n\n### Tactical Trading Takeaway\nTrack negative basin movements across major currency pairs. Sudden spikes signals near-term upside exhaustion loops for higher-yielding cross-assets.`
             },
             {
                 id: "blog-02",
@@ -239,204 +216,3 @@
                 markdown: `# Asymmetric Volatility Modeling Across Central Bank Pivots\n\n## Regime Parameterization\nOptions matrices pricing distributions often show heavy skew variations prior to high-impact economic prints or policy updates.\n\n### Volatility Smile Dynamics\nBy extracting data across multi-strike setups, we can accurately track directional biases inside the institutional workspace:\n\n1.  **Call Skew Superiority:** Signals speculative spot accumulation plays across primary dealers.\n2.  **Put Implied Dominance:** Indicates massive macro delta hedging configurations are locking in asset baselines.\n\nUse this information alongside macroeconomic data lines to position risk ahead of major market moves.`
             }
         ];
-
-        const KAIROS_ACADEMY_DATABASE = [
-            {
-                id: "acad-01",
-                moduleCode: "VOL_01",
-                track: "FOUNDATIONS",
-                title: "Systematic Capital Allocation & Variance Positioning Models",
-                description: "A complete framework for managing risk parameters, size controls, and portfolio variance parameters.",
-                markdown: `# Systematic Capital Allocation Models\n\n## Core Position Sizing Methodology\nTo preserve risk allocation parameters under heavy tail-risk conditions, we use fixed variance controls across our positions.\n\n### The Position Dimension Formulation\nPosition sizes are mathematically determined by scaling target portfolio risk allocations against asset historical variance:\n\n\`\`\`text\nPosition Size = (Target Portfolio Risk Coefficient) / (Asset Historical Rolling Variance)\n\`\`\`\n\n*   This approach automatically scales back exposure sizes when market conditions turn highly volatile.\n*   It preserves performance metrics and prevents catastrophic losses during unexpected regime shifts.\n\n### Milestone Checklist\n* Identify rolling 22-day historical standard deviation levels.\n* Set absolute portfolio failure thresholds at 1.5% max capital impact.\n* Execute structural position adjustments across changing volatility environments.`
-            },
-            {
-                id: "acad-02",
-                moduleCode: "VOL_02",
-                track: "ADVANCED STRATEGY",
-                title: "Cross-Market Yield Correlations & Interest Rate Pipeline Mapping",
-                description: "Master tracking methods for analyzing inter-market bond spread frameworks to anticipate major equity index movements.",
-                markdown: `# Interest Rate Pipeline Mapping\n\n## Inter-Market Treasury Spread Analysis\nSovereign bond yield differentials serve as a primary macro driver for cross-border capital reallocation patterns.\n\n### Yield Curves as Forward Indicators\nWhen short-term bond yields exceed long-term payouts, the resulting inversion signals cooling macro conditions. Track these adjustments closely to help structure risk management plans ahead of structural market realignments.`
-            }
-        ];
-
-        // ================= STATE ENGINE HOOKS =================
-        let activeView = localStorage.getItem('kairos_view') || 'terminal';
-        let activeLayout = localStorage.getItem('kairos_layout') || 'single';
-        let completedModules = JSON.parse(localStorage.getItem('kairos_completed_modules')) || [];
-
-        // ================= COMPONENT INTERACTION CONTROLLERS =================
-        function switchView(viewName) {
-            activeView = viewName;
-            localStorage.setItem('kairos_view', viewName);
-            
-            document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
-            
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            const targetNav = document.getElementById(`nav-${viewName}`);
-            if(targetNav) targetNav.classList.add('active-nav');
-            
-            const titleMap = {
-                'terminal': 'Live Market Workspace',
-                'blog': 'Systematic Intelligence Pipeline',
-                'academy': 'Systematic Training Modules'
-            };
-            document.getElementById('current-view-title').textContent = titleMap[viewName];
-            
-            const layoutTools = document.getElementById('workspace-layout-controls');
-            if(viewName === 'terminal') {
-                layoutTools.style.opacity = '1';
-                layoutTools.style.pointerEvents = 'auto';
-            } else {
-                layoutTools.style.opacity = '0';
-                layoutTools.style.pointerEvents = 'none';
-            }
-            
-            if(viewName === 'terminal') {
-                initTradingViewWorkspace();
-            }
-        }
-
-        function setLayout(layoutFormat) {
-            activeLayout = layoutFormat;
-            localStorage.setItem('kairos_layout', layoutFormat);
-            
-            const slotB = document.getElementById('tv-canvas-slot-b-holder');
-            const gridContainer = document.getElementById('chart-workspace-container');
-            const btnSingle = document.getElementById('layout-btn-single');
-            const btnSplit = document.getElementById('layout-btn-split');
-            
-            btnSingle.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
-            btnSplit.className = "px-2 py-1 text-[10px] uppercase rounded transition-all cursor-pointer font-bold text-zinc-500 hover:text-zinc-300";
-
-            if(layoutFormat === 'split') {
-                gridContainer.classList.replace('grid-cols-1', 'grid-cols-2');
-                slotB.classList.remove('hidden');
-                btnSplit.classList.add('bg-zinc-900', 'text-cyan-400', 'border', 'border-zinc-800');
-            } else {
-                gridContainer.classList.replace('grid-cols-2', 'grid-cols-1');
-                slotB.classList.add('hidden');
-                btnSingle.classList.add('bg-zinc-900', 'text-cyan-400', 'border', 'border-zinc-800');
-            }
-            
-            initTradingViewWorkspace();
-        }
-
-        // ================= TRADINGVIEW IFRAME SYSTEM BOOTING =================
-        function initTradingViewWorkspace() {
-            document.getElementById('tv-canvas-slot-a').innerHTML = '';
-            document.getElementById('tv-canvas-slot-b').innerHTML = '';
-
-            new TradingView.widget({
-                "width": "100%", "height": "100%", "symbol": "FX:EURUSD",
-                "interval": "240", "timezone": "Etc/UTC", "theme": "dark",
-                "style": "1", "locale": "en", "container_id": "tv-canvas-slot-a",
-                "backgroundColor": "#08080c", "gridColor": "rgba(20, 20, 30, 0.4)"
-            });
-
-            if(activeLayout === 'split') {
-                new TradingView.widget({
-                    "width": "100%", "height": "100%", "symbol": "TVC:US10Y",
-                    "interval": "D", "timezone": "Etc/UTC", "theme": "dark",
-                    "style": "1", "locale": "en", "container_id": "tv-canvas-slot-b",
-                    "backgroundColor": "#08080c", "gridColor": "rgba(20, 20, 30, 0.4)"
-                });
-            }
-        }
-
-        // ================= PUBLICATIONS & ACADEMY RENDERING ENGINES =================
-        function compileAndOpenDocument(type, id) {
-            const database = type === 'blog' ? KAIROS_BLOG_DATABASE : KAIROS_ACADEMY_DATABASE;
-            const documentObject = database.find(item => item.id === id);
-            if(!documentObject) return;
-
-            document.getElementById('modal-badge').textContent = type === 'blog' ? `RESEARCH_LOG // ${documentObject.category}` : `ACADEMY_LOG // ${documentObject.moduleCode}`;
-            document.getElementById('markdown-reader-target').innerHTML = marked.parse(documentObject.markdown);
-            document.getElementById('immersive-reader').style.display = 'flex';
-        }
-
-        function closeReader() {
-            document.getElementById('immersive-reader').style.display = 'none';
-        }
-
-        function toggleModuleMilestone(id, event) {
-            event.stopPropagation();
-            if(completedModules.includes(id)) {
-                completedModules = completedModules.filter(mId => mId !== id);
-            } else {
-                completedModules.push(id);
-            }
-            localStorage.setItem('kairos_completed_modules', JSON.stringify(completedModules));
-            renderAcademyDomElements();
-            calculateProgressMetrics();
-        }
-
-        function calculateProgressMetrics() {
-            const totalModules = KAIROS_ACADEMY_DATABASE.length;
-            if(totalModules === 0) return;
-            const ratio = Math.round((completedModules.length / totalModules) * 100);
-            document.getElementById('sidebar-progress-metric').textContent = `${ratio}%`;
-        }
-
-        function renderPublicationsFeed() {
-            const targetGrid = document.getElementById('blog-posts-grid');
-            targetGrid.innerHTML = KAIROS_BLOG_DATABASE.map(post => `
-                <article onclick="compileAndOpenDocument('blog', '${post.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 transition-all rounded p-5 flex flex-col justify-between cursor-pointer group">
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center font-mono text-[10px]">
-                            <span class="text-amber-500 font-bold tracking-wider">${post.category}</span>
-                            <span class="text-zinc-500">${post.readTime}</span>
-                        </div>
-                        <h3 class="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors tracking-tight font-mono">${post.title}</h3>
-                        <p class="text-xs text-zinc-400 leading-relaxed">${post.summary}</p>
-                    </div>
-                    <div class="flex items-center justify-between font-mono text-[10px] text-zinc-600 border-t border-zinc-900 pt-3 mt-4">
-                        <span>KAIROS OBSERVER</span>
-                        <span>${post.date}</span>
-                    </div>
-                </article>
-            `).join('');
-        }
-
-        function renderAcademyDomElements() {
-            const targetStack = document.getElementById('academy-modules-stack');
-            targetStack.innerHTML = KAIROS_ACADEMY_DATABASE.map(mod => {
-                const isFinished = completedModules.includes(mod.id);
-                return `
-                    <div onclick="compileAndOpenDocument('academy', '${mod.id}')" class="bg-[#08080c] border border-zinc-900 hover:border-zinc-800 rounded p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all cursor-pointer group">
-                        <div class="space-y-1.5">
-                            <div class="flex items-center gap-3 font-mono text-[10px]">
-                                <span class="px-2 py-0.5 rounded bg-zinc-950 border border-zinc-900 text-zinc-400 font-bold">${mod.moduleCode}</span>
-                                <span class="text-emerald-500 uppercase tracking-wider font-semibold">${mod.track}</span>
-                            </div>
-                            <h4 class="text-sm font-bold text-white tracking-tight font-mono group-hover:text-emerald-400 transition-colors">${mod.title}</h4>
-                            <p class="text-xs text-zinc-400 max-w-2xl">${mod.description}</p>
-                        </div>
-                        <button onclick="toggleModuleMilestone('${mod.id}', event)" class="px-3 py-1.5 border font-mono text-[10px] rounded transition-all cursor-pointer ${
-                            isFinished 
-                            ? 'bg-emerald-950/20 text-emerald-400 border-emerald-500/30 font-bold' 
-                            : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:border-zinc-600'
-                        }">
-                            ${isFinished ? '✓ COMPLETION_SECURED' : 'MARK COMPLETE'}
-                        </button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // ================= GLOBAL PLATFORM INITIALIZATION SYSTEMS =================
-        window.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeReader(); });
-        
-        setInterval(() => {
-            document.getElementById('live-time').textContent = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-        }, 1000);
-
-        renderPublicationsFeed();
-        renderAcademyDomElements();
-        calculateProgressMetrics();
-        
-        switchView(activeView);
-        setLayout(activeLayout);
-    </script>
-</body>
-</html>
