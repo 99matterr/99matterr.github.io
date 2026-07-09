@@ -4,14 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gabriel Vasquez | Selected Works</title>
+    <!-- Premium Google Fonts Integration -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
+            /* High-Fidelity Deep Slate Palette */
+            --bg-color: #0d1321;
+            --card-bg: #141c2f;
+            --dark-shadow: #070a12;     
+            --light-shadow: #212c47;    
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #38bdf8;
-            --hover-scale: 1.03;
+            --text-muted: #64748b;
+            --accent: #38bdf8;          
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            
+            /* High-End Transition Easing Curve */
+            --cb-fluid: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
@@ -21,118 +32,269 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background: radial-gradient(circle at 50% -20%, #1e293b 0%, var(--bg-color) 70%);
             color: var(--text-main);
             line-height: 1.6;
-            padding: 2rem 1rem;
+            padding: 4rem 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Centered Header Layout */
+        /* HUD Header Styling */
         header {
             text-align: center;
-            max-width: 600px;
-            margin-bottom: 3.5rem;
-            margin-top: 2rem;
+            max-width: 650px;
+            margin-bottom: 5rem;
+            margin-top: 1rem;
         }
 
         .eyebrow {
-            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.35em;
             color: var(--accent);
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-shadow: 0 0 12px var(--accent-glow);
         }
 
         header h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 800;
-            letter-spacing: -0.05em;
-            margin-bottom: 0.75rem;
-            background: linear-gradient(to right, #f8fafc, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.04em;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            text-shadow: 0 4px 24px rgba(255, 255, 255, 0.05);
         }
 
         header p {
             color: var(--text-muted);
             font-size: 1.1rem;
+            font-weight: 400;
+            max-width: 520px;
+            margin: 0 auto;
         }
 
-        /* Centered Portfolio Grid */
+        /* Premium Center-Balanced Layout Grid */
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 3rem;
             width: 100%;
-            max-width: 1050px;
-            margin: 0 auto 4rem auto;
-            justify-content: center;
+            max-width: 1140px;
+            margin: 0 auto auto auto;
+            padding: 15px;
         }
 
-        /* Card Styling */
+        /* High-Fidelity Cyber-Neumorphic Card */
         .portfolio-card {
             background-color: var(--card-bg);
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 2rem;
+            border: none; /* Removed static border to let the animated effect handle it */
+            border-radius: 28px;
+            padding: 2.75rem 2.5rem;
             text-decoration: none;
             color: inherit;
-            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
-            min-height: 250px;
+            min-height: 290px;
+            position: relative;
+            
+            /* Deep High-Definition Neumorphic Shadows */
+            box-shadow: 
+                14px 14px 32px var(--dark-shadow), 
+                -10px -10px 24px var(--light-shadow);
+                
+            transition: 
+                transform 0.5s var(--cb-fluid), 
+                box-shadow 0.5s var(--cb-fluid);
         }
 
+        /* The Subtle Moving Edge Effect */
+        .portfolio-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            padding: 1.5px; /* Precision line width */
+            
+            /* Subtle flowing gradient track */
+            background: linear-gradient(135deg, 
+                var(--light-shadow) 0%, 
+                rgba(56, 189, 248, 0.15) 30%, 
+                var(--light-shadow) 50%,
+                var(--dark-shadow) 70%,
+                rgba(56, 189, 248, 0.15) 85%,
+                var(--light-shadow) 100%
+            );
+            background-size: 300% 300%;
+            
+            /* Perfect masking to ensure the gradient only shows on the 1.5px outer border perimeter */
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            
+            pointer-events: none;
+            /* Ultra-slow, seamless loop for subtle movement */
+            animation: fluidEdge 16s linear infinite; 
+            transition: opacity 0.5s var(--cb-fluid);
+            opacity: 0.7;
+        }
+
+        /* Hover Mechanics: Structural Lift + Edge Excitation */
         .portfolio-card:hover {
-            transform: translateY(-5px) scale(var(--hover-scale));
-            border-color: var(--accent);
-            box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.1);
+            transform: translateY(-6px);
+            box-shadow: 
+                0 12px 40px rgba(7, 10, 18, 0.4),
+                18px 18px 40px var(--dark-shadow), 
+                -14px -14px 35px var(--light-shadow);
         }
 
-        .card-content {
-            width: 100%;
+        /* Make the moving border slightly brighter and faster on hover */
+        .portfolio-card:hover::before {
+            opacity: 1;
+            animation-duration: 8s;
+            background: linear-gradient(135deg, 
+                var(--light-shadow) 0%, 
+                rgba(56, 189, 248, 0.35) 25%, 
+                var(--light-shadow) 50%,
+                var(--dark-shadow) 75%,
+                rgba(56, 189, 248, 0.35) 90%,
+                var(--light-shadow) 100    %
+            );
+            background-size: 300% 300%;
         }
 
+        /* Interactive Mechanical Press State */
+        .portfolio-card:active {
+            transform: translateY(-1px);
+            box-shadow: 
+                inset 8px 8px 16px var(--dark-shadow), 
+                inset -8px -8px 16px var(--light-shadow);
+        }
+
+        /* Card Meta HUD Components */
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .card-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s var(--cb-fluid);
+        }
+
+        .portfolio-card:hover .card-status {
+            color: var(--accent);
+        }
+
+        /* Micro LED dot indicator */
+        .card-status::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            transition: background-color 0.3s var(--cb-fluid), box-shadow 0.3s var(--cb-fluid);
+        }
+
+        .portfolio-card:hover .card-status::before {
+            background-color: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        /* Typography Hierarchies */
         .card-content h2 {
-            font-size: 1.4rem;
-            margin-bottom: 0.75rem;
+            font-size: 1.5rem;
+            margin-bottom: 0.85rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
         }
 
         .card-content p {
             color: var(--text-muted);
             font-size: 0.95rem;
+            line-height: 1.6;
         }
 
-        /* Arrow Absolute Bottom Baseline Alignment Fix */
-        .card-link-arrow {
-            margin-top: auto; 
+        /* Advanced Nested Neumorphic Action Node */
+        .card-action-node {
+            margin-top: auto;
             align-self: flex-end;
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 1.2rem;
-            transition: transform 0.2s ease;
-            line-height: 1;
-            padding-top: 1rem;
+            width: 44px;
+            height: 44px;
+            background-color: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            
+            /* Molded internal socket shadows */
+            box-shadow: 
+                inset 3px 3px 6px var(--dark-shadow), 
+                inset -3px -3px 6px var(--light-shadow);
+                
+            transition: transform 0.4s var(--cb-fluid), color 0.4s var(--cb-fluid), box-shadow 0.4s var(--cb-fluid);
         }
 
-        .portfolio-card:hover .card-link-arrow {
-            transform: translateX(4px);
+        /* Hover: Inner node pops out of the socket smoothly */
+        .portfolio-card:hover .card-action-node {
+            color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 
+                3px 3px 8px var(--dark-shadow), 
+                -3px -3px 8px var(--light-shadow),
+                0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .card-action-node span {
+            transition: transform 0.4s var(--cb-fluid);
+        }
+
+        .portfolio-card:hover .card-action-node span {
+            transform: translateX(2px);
+        }
+
+        /* Border Flow Keyframe Loop */
+        @keyframes fluidEdge {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 150%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         footer {
-            margin-top: auto;
+            margin-top: 6rem;
             text-align: center;
             color: var(--text-muted);
-            font-size: 0.85rem;
-            padding: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            padding: 1.5rem 0;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -145,33 +307,54 @@
     </header>
 
     <main class="grid-container">
+        <!-- Project Module 01 -->
         <a href="https://99matterr.github.io/Tennis-portfolio/index.html" class="portfolio-card" target="_blank">
+            <div class="card-meta">
+                <span class="card-id">[ 01 ]</span>
+                <span class="card-status">LIVE MODULE</span>
+            </div>
             <div class="card-content">
                 <h2>Tennis Portfolio</h2>
                 <p>Articles, player development methodologies, and training insights on modern tennis progression.</p>
             </div>
-            <div class="card-link-arrow">&rarr;</div>
+            <div class="card-action-node">
+                <span>&rarr;</span>
+            </div>
         </a>
 
+        <!-- Project Module 02 -->
         <a href="https://99matterr.github.io/Macro-trading-hub/" class="portfolio-card" target="_blank">
+            <div class="card-meta">
+                <span class="card-id">[ 02 ]</span>
+                <span class="card-status">TERMINAL COCKPIT</span>
+            </div>
             <div class="card-content">
                 <h2>Kairos Global Research</h2>
                 <p>An institutional-grade terminal cockpit for cross-asset liquidity tracking, macro feeds, and technical analysis.</p>
             </div>
-            <div class="card-link-arrow">&rarr;</div>
+            <div class="card-action-node">
+                <span>&rarr;</span>
+            </div>
         </a>
 
+        <!-- Project Module 03 -->
         <a href="https://99matterr.github.io/web-development-projects/" class="portfolio-card" target="_blank">
+            <div class="card-meta">
+                <span class="card-id">[ 03 ]</span>
+                <span class="card-status">CORE REPOSITORY</span>
+            </div>
             <div class="card-content">
                 <h2>Web Development</h2>
                 <p>A showcase of clean UI/UX code architectures, script automation, and web applications.</p>
             </div>
-            <div class="card-link-arrow">&rarr;</div>
+            <div class="card-action-node">
+                <span>&rarr;</span>
+            </div>
         </a>
     </main>
 
     <footer>
-        <p>&copy; 2026 Built with clean code & purpose.</p>
+        <p>&copy; 2026 // CORE SYSTEM ONLINE. OPERATING WITH PURPOSE.</p>
     </footer>
 
 </body>
