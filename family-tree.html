@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuadro Genealógico - Sistema de Auditoría y Exportación PDF</title>
+    <!-- Tailwind CSS for modern layout styling -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- html2pdf.js dependency for client-side PDF rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .tree-node {
+            transition: all 0.2s ease-in-out;
+        }
+        .tree-node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white shadow-md p-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Cuadro Genealógico Interactivo</h1>
+                <p class="text-xs text-indigo-200 mt-1">Módulo de Auditoría y Exportación Documental</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm flex items-center gap-1">
+                    💾 Exportar a PDF
+                </button>
+                <button onclick="resetToDefault()" class="bg-indigo-700 hover:bg-indigo-600 px-3 py-1.5 rounded text-xs font-semibold transition">
+                    Restaurar Datos Originales
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- Left Sidebar: Directory List (Excluded from PDF) -->
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-xs border border-slate-200 p-4 flex flex-col h-[600px] lg:h-auto">
+            <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Buscar Integrantes</h2>
+            <input type="text" id="searchBar" oninput="renderList()" placeholder="Filtrar por nombre o ID..." class="w-full p-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            
+            <div id="peopleList" class="flex-1 overflow-y-auto space-y-1 pr-1">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Center & Right Panel: Tree View and Editor Split -->
+        <div class="lg:col-span-3 flex flex-col gap-6">
+            
+            <!-- EXPORT TARGET: Everything wrapped inside this div will render in the PDF file cleanly -->
+            <div id="exportableWorkspace" class="space-y-6 bg-slate-50 p-2 rounded-xl">
+                
+                <!-- Dynamic Pedigree Chart Component -->
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">Vista del Árbol de Ascendencia</h2>
+                    
+                    <div class="grid grid-cols-3 gap-4 items-center relative">
+                        <!-- Column 3: Grandparents -->
+                        <div class="col-start-3 row-start-1 space-y-12 flex flex-col justify-around h-full py-2">
+                            <div id="node-paternal-gf"></div>
+                            <div id="node-paternal-gm"></div>
+                            <div id="node-maternal-gf"></div>
+                            <div id="node-maternal-gm"></div>
+                        </div>
+
+                        <!-- Column 2: Parents -->
+                        <div class="col-start-2 row-start-1 space-y-24 flex flex-col justify-around h-full py-8">
+                            <div id="node-father"></div>
+                            <div id="node-mother"></div>
+                        </div>
+
+                        <!-- Column 1: Central Focused Person -->
+                        <div class="col-start-1 row-start-1 flex flex-col justify-center h-full">
+                            <div id="node-focus"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Details Split Container -->
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Detalles del Familiar Seleccionado</h2>
+                    <div id="personDetailCard" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                    <!-- Action buttons wrapper explicitly flagged to hide during automated PDF processing operations -->
+                    <div id="actionButtons" class="mt-6 pt-4 border-t border-slate-100 flex gap-2 data-html2pdf-ignore">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Interactive Add/Edit Form Panel (Excluded from PDF automatically) -->
+            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                <h2 id="formTitle" class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Añadir Familiar Relacionado</h2>
+                <form id="addRelativeForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
+                    
+                    <div id="relationshipSelectorGroup">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Parentesco con la persona seleccionada</label>
+                        <select id="formRelationship" class="w-full p-2 border border-slate-300 rounded-md text-sm bg-white">
+                            <option value="father">Padre</option>
+                            <option value="mother">Madre</option>
+                            <option value="spouse">Esposo / Esposa</option>
+                            <option value="child_of_mother">Hijo/Hija (La persona actual es la MADRE)</option>
+                            <option value="child_of_father">Hijo/Hija (La persona actual es el PADRE)</option>
+                        </select>
+                    </div>
+
+                    <!-- AUDIT GROUP: Hidden during creation, accessible via editing execution pathways -->
+                    <div id="relationshipAuditGroup" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2 mb-2">
+                        <span class="text-[11px] font-bold tracking-wider text-amber-700 uppercase block">Auditoría de Vínculos Estructurales</span>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-600">Asignar Padre</label>
+                            <select id="auditFather" class="w-full p-1 border border-slate-300 rounded text-xs bg-white"></select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-600">Asignar Madre</label>
+                            <select id="auditMother" class="w-full p-1 border border-slate-300 rounded text-xs bg-white"></select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-slate-600">Asignar Cónyuge</label>
+                            <select id="auditSpouse" class="w-full p-1 border border-slate-300 rounded text-xs bg-white"></select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre Completo (Legal/Soltera)</label>
+                        <input type="text" id="formName" required placeholder="Ej. Juan Perez" class="w-full p-2 border border-slate-300 rounded-md text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">ID Familiar</label>
+                            <input type="text" id="formFsId" placeholder="Ej. ABCD-123" class="w-full p-2 border border-slate-300 rounded-md text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Fecha Nacimiento</label>
+                            <input type="text" id="formBirthDate" placeholder="Ej. 4 oct 1996" class="w-full p-2 border border-slate-300 rounded-md text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Lugar de Nacimiento</label>
+                        <input type="text" id="formBirthPlace" placeholder="Ciudad, Estado, País" class="w-full p-2 border border-slate-300 rounded-md text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Fecha Defunción</label>
+                            <input type="text" id="formDeathDate" placeholder="Fecha" class="w-full p-2 border border-slate-300 rounded-md text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Lugar Defunción</label>
+                            <input type="text" id="formDeathPlace" placeholder="Lugar" class="w-full p-2 border border-slate-300 rounded-md text-sm">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 mt-2">
+                        <button type="button" id="cancelEditBtn" onclick="exitEditMode()" class="hidden flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium p-2 rounded-md text-sm transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="submitBtn" class="flex-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium p-2 rounded-md text-sm transition shadow-xs">
+                            Guardar y Vincular Familiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Core App State Engine -->
+    <script>
+        // Foundational database loaded initially
+        const defaultPeople = [
+            { id: "1", name: "Carolina De Los Angeles Herrera Rodriguez", fsId: "GXJX-SRP", birthDate: "9 de noviembre de 1972", birthPlace: "Valencia, Carabobo, Venezuela", deathDate: "", deathPlace: "", marriageDate: "27 de julio de 1996", marriagePlace: "Valencia, Carabobo, Venezuela", spouseId: "spouse-1", fatherId: "2", motherId: "3", children: [] },
+            { id: "spouse-1", name: "José Gregorio Vasquez Cueva", fsId: "GXJX-WV", birthDate: "", birthPlace: "", deathDate: "", deathPlace: "", spouseId: "1", fatherId: "", motherId: "", children: [] },
+            { id: "2", name: "Miguel Alfredo Herrera Ostos", fsId: "GXJX-HI", birthDate: "4 de junio de 1945", birthPlace: "Valencia, Carabobo, Venezuela", deathDate: "", deathPlace: "", marriageDate: "15 de agosto de 1970", marriagePlace: "Tocuyito, Libertador, Carabobo, Venezuela", fatherId: "4", motherId: "5", children: ["1"] },
+            { id: "3", name: "Herminia Rafaela Rodríguez Díaz", fsId: "LLV", birthDate: "3 de julio de 1947", birthPlace: "Bejuma, Carabobo, Venezuela", deathDate: "27 de noviembre de 2015", deathPlace: "Carabobo, Venezuela", fatherId: "6", motherId: "7", children: ["1"] },
+            { id: "4", name: "Francisco Joaquín Herrera", fsId: "GR5V-25Q", birthDate: "", birthPlace: "", deathDate: "", deathPlace: "", fatherId: "", motherId: "", children: ["2"] },
+            { id: "5", name: "Ramona Ostos", fsId: "GXJ5-RVB", birthDate: "", birthPlace: "", deathDate: "", deathPlace: "", fatherId: "", motherId: "", children: ["2"] },
+            { id: "6", name: "Rafael Rodríguez Báez", fsId: "LLWP-6Y3", birthDate: "20 de febrero de 1923", birthPlace: "Bejuma, Carabobo, Venezuela", deathDate: "30 de diciembre de 2012", deathPlace: "Carabobo, Venezuela", marriageDate: "2 de octubre de 1946", marriagePlace: "San Rafael, Bejuma, Carabobo, Venezuela", fatherId: "12", motherId: "13", children: ["3"] },
+            { id: "7", name: "Delia Mercedes Diaz Giran", fsId: "LLWP-6LE", birthDate: "18 de septiembre de 1922", birthPlace: "Bejuma, Carabobo, Venezuela", deathDate: "3 de marzo de 2009", deathPlace: "Carabobo, Venezuela", fatherId: "14", motherId: "15", children: ["3"] },
+            { id: "12", name: "Luis Felipe Rodriguez", fsId: "KH6D-8CW", birthDate: "aproximadamente 1888", birthPlace: "Tinaquillo, Cojedes, Venezuela", deathDate: "antes de 1946", deathPlace: "Venezuela", marriageDate: "1914", marriagePlace: "", fatherId: "", motherId: "", children: ["6"] },
+            { id: "13", name: "Maria Teresa Baez Henriquez", fsId: "KH3T-CNK", birthDate: "2 de septiembre de 1892", birthPlace: "Tinaquillo, Cojedes, Venezuela", deathDate: "1 de febrero de 1983", deathPlace: "Valencia, Carabobo, Venezuela", fatherId: "", motherId: "", children: ["6"] },
+            { id: "14", name: "Juan Diaz", fsId: "G6XB-JQL", birthDate: "1879", birthPlace: "Bejuma, Carabobo, Venezuela", deathDate: "", deathPlace: "", fatherId: "", motherId: "", children: ["7"] },
+            { id: "15", name: "Maria de Lourdes Giran", fsId: "G6XB-YJW", birthDate: "", birthPlace: "Bejuma, Carabobo, Venezuela", deathDate: "", deathPlace: "", fatherId: "", motherId: "", children: ["7"] }
+        ];
+
+        let people = JSON.parse(localStorage.getItem('interactive_family_tree')) || defaultPeople;
+        let selectedPersonId = "1";
+        let editingPersonId = null;
+
+        function saveState() {
+            localStorage.setItem('interactive_family_tree', JSON.stringify(people));
+        }
+
+        function resetToDefault() {
+            if(confirm("¿Deseas restaurar los datos iniciales? Esto borrará adiciones personalizadas.")) {
+                people = JSON.parse(JSON.stringify(defaultPeople));
+                selectedPersonId = "1";
+                exitEditMode();
+                saveState();
+                updateUI();
+            }
+        }
+
+        function getPerson(id) {
+            return people.find(p => p.id === id);
+        }
+
+        function selectPerson(id) {
+            if (!id) return;
+            selectedPersonId = id;
+            exitEditMode();
+            updateUI();
+        }
+
+        // Automated Document Generator Engine Routine
+        function exportToPDF() {
+            const currentPerson = getPerson(selectedPersonId);
+            const safeFileName = currentPerson ? `Arbol_${currentPerson.name.replace(/\s+/g, '_')}.pdf` : 'cuadro_genealogico.pdf';
+            
+            const targetElement = document.getElementById('exportableWorkspace');
+            
+            // Layout styling options tailored for clean vector generation results
+            const configOptions = {
+                margin:       0.4,
+                filename:     safeFileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, logging: false, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' },
+                pagebreak:    { mode: ['avoid-all'] }
+            };
+
+            // Run the compiler script pipeline
+            html2pdf().set(configOptions).from(targetElement).save();
+        }
+
+        function createNodeHTML(person, label) {
+            if (!person) {
+                return `
+                    <div class="bg-slate-100 border border-dashed border-slate-300 rounded-lg p-3 text-center text-xs text-slate-400">
+                        <p class="font-semibold text-slate-500">${label}</p>
+                        <p class="italic text-[11px]">Sin registrar</p>
+                    </div>
+                `;
+            }
+            return `
+                <div onclick="selectPerson('${person.id}')" class="tree-node bg-white border-l-4 ${person.deathDate ? 'border-amber-600' : 'border-indigo-600'} shadow-xs border border-slate-200 rounded-lg p-3 cursor-pointer text-left">
+                    <span class="text-[10px] font-bold tracking-wider text-indigo-500 uppercase block">${label}</span>
+                    <h3 class="text-xs font-bold text-slate-800 line-clamp-1 mt-0.5">${person.name}</h3>
+                    <p class="text-[11px] text-slate-400 font-mono">${person.fsId || 'S/ID'}</p>
+                </div>
+            `;
+        }
+
+        function updateUI() {
+            const current = getPerson(selectedPersonId);
+            if (!current) return;
+            
+            const father = getPerson(current.fatherId);
+            const mother = getPerson(current.motherId);
+            const paternalGf = father ? getPerson(father.fatherId) : null;
+            const paternalGm = father ? getPerson(father.motherId) : null;
+            const maternalGf = mother ? getPerson(mother.fatherId) : null;
+            const maternalGm = mother ? getPerson(mother.motherId) : null;
+
+            document.getElementById('node-focus').innerHTML = createNodeHTML(current, 'Persona Central Focus');
+            document.getElementById('node-father').innerHTML = createNodeHTML(father, 'Padre');
+            document.getElementById('node-mother').innerHTML = createNodeHTML(mother, 'Madre');
+            document.getElementById('node-paternal-gf').innerHTML = createNodeHTML(paternalGf, 'Abuelo Paterno');
+            document.getElementById('node-paternal-gm').innerHTML = createNodeHTML(paternalGm, 'Abuela Paterna');
+            document.getElementById('node-maternal-gf').innerHTML = createNodeHTML(maternalGf, 'Abuelo Materno');
+            document.getElementById('node-maternal-gm').innerHTML = createNodeHTML(maternalGm, 'Abuela Materna');
+
+            let spouse = getPerson(current.spouseId);
+            let childrenList = (current.children || []).map(cid => getPerson(cid)).filter(Boolean);
+
+            let detailsHTML = `
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">${current.name}</h3>
+                    <p class="text-xs font-mono text-indigo-600">${current.fsId ? `FamilySearch ID: ${current.fsId}` : 'Sin ID registrado'}</p>
+                </div>
+                <hr class="border-slate-100">
+                <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
+                    <div><span class="text-slate-400 block font-medium">Nacimiento</span> <span>${current.birthDate || 'No registrada'}</span></div>
+                    <div><span class="text-slate-400 block font-medium">Lugar</span> <span class="line-clamp-2">${current.birthPlace || 'No registrado'}</span></div>
+                    ${current.deathDate ? `<div><span class="text-slate-400 block font-medium">Defunción</span> <span>${current.deathDate}</span></div>` : ''}
+                    ${current.deathPlace ? `<div><span class="text-slate-400 block font-medium">Lugar Def.</span> <span class="line-clamp-2">${current.deathPlace}</span></div>` : ''}
+                </div>
+            `;
+
+            if(spouse) {
+                detailsHTML += `
+                    <hr class="border-slate-100">
+                    <div class="text-xs">
+                        <span class="text-slate-400 block font-medium mb-1">Cónyuge</span>
+                        <div onclick="selectPerson('${spouse.id}')" class="bg-indigo-50 border border-indigo-100 rounded p-2 cursor-pointer hover:bg-indigo-100 text-indigo-900 font-medium">
+                            ${spouse.name}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if(childrenList.length > 0) {
+                detailsHTML += `
+                    <hr class="border-slate-100">
+                    <div class="text-xs">
+                        <span class="text-slate-400 block font-medium mb-1">Hijos/Descendientes</span>
+                        <div class="space-y-1">
+                            ${childrenList.map(child => `
+                                <div onclick="selectPerson('${child.id}')" class="bg-emerald-50 border border-emerald-100 rounded p-1.5 px-2 cursor-pointer hover:bg-emerald-100 text-emerald-900 font-medium text-xs">
+                                    ${child.name}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('personDetailCard').innerHTML = detailsHTML;
+
+            // Notice the custom directive data-html2pdf-ignore inside this container layout element block
+            document.getElementById('actionButtons').innerHTML = `
+                <button onclick="enterEditMode('${current.id}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-3 rounded-md text-xs transition">
+                    Editar Datos / Auditoría Relacional
+                </button>
+                <button onclick="deletePerson('${current.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium py-2 px-3 rounded-md text-xs transition">
+                    Eliminar
+                </button>
+            `;
+
+            renderList();
+        }
+
+        function renderList() {
+            const searchVal = document.getElementById('searchBar').value.toLowerCase();
+            const container = document.getElementById('peopleList');
+            container.innerHTML = '';
+
+            people.filter(p => p.name.toLowerCase().includes(searchVal)).forEach(p => {
+                const isSelected = p.id === selectedPersonId;
+                const el = document.createElement('div');
+                el.className = `p-2 rounded-lg text-xs font-medium cursor-pointer transition ${isSelected ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100 text-slate-700'}`;
+                el.innerHTML = `<div class="flex justify-between items-center"><span class="truncate">${p.name}</span></div>`;
+                el.onclick = () => selectPerson(p.id);
+                container.appendChild(el);
+            });
+        }
+
+        function populateAuditDropdown(dropdownId, currentValue, excludeId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.innerHTML = '<option value="">-- Ninguno (Desvincular) --</option>';
+            
+            people.forEach(p => {
+                if (p.id !== excludeId) {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.innerText = p.name;
+                    if (p.id === currentValue) opt.selected = true;
+                    dropdown.appendChild(opt);
+                }
+            });
+        }
+
+        function enterEditMode(id) {
+            const target = getPerson(id);
+            if(!target) return;
+
+            editingPersonId = id;
+            
+            document.getElementById('formTitle').innerText = `Auditoría e Historial de: ${target.name}`;
+            document.getElementById('submitBtn').innerText = "Aplicar Cambios Estructurales";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('relationshipSelectorGroup').classList.add('hidden');
+            
+            document.getElementById('relationshipAuditGroup').classList.remove('hidden');
+            populateAuditDropdown('auditFather', target.fatherId, id);
+            populateAuditDropdown('auditMother', target.motherId, id);
+            populateAuditDropdown('auditSpouse', target.spouseId, id);
+
+            document.getElementById('formName').value = target.name || '';
+            document.getElementById('formFsId').value = target.fsId || '';
+            document.getElementById('formBirthDate').value = target.birthDate || '';
+            document.getElementById('formBirthPlace').value = target.birthPlace || '';
+            document.getElementById('formDeathDate').value = target.deathDate || '';
+            document.getElementById('formDeathPlace').value = target.deathPlace || '';
+        }
+
+        function exitEditMode() {
+            editingPersonId = null;
+            document.getElementById('formTitle').innerText = "Añadir Familiar Relacionado";
+            document.getElementById('submitBtn').innerText = "Guardar y Vincular Familiar";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('relationshipSelectorGroup').classList.remove('hidden');
+            document.getElementById('relationshipAuditGroup').classList.add('hidden');
+            document.getElementById('addRelativeForm').reset();
+        }
+
+        function deletePerson(id) {
+            if(people.length <= 1) return;
+            const target = getPerson(id);
+            if(confirm(`¿Eliminar a ${target.name}?`)) {
+                people.forEach(p => {
+                    if (p.fatherId === id) p.fatherId = "";
+                    if (p.motherId === id) p.motherId = "";
+                    if (p.spouseId === id) p.spouseId = "";
+                    if (p.children) p.children = p.children.filter(cid => cid !== id);
+                });
+                people = people.filter(p => p.id !== id);
+                saveState();
+                selectedPersonId = people[0].id;
+                exitEditMode();
+                updateUI();
+            }
+        }
+
+        function syncInverseRelations(personId, oldRef, newRef, type) {
+            if (oldRef && oldRef !== newRef) {
+                const oldPerson = getPerson(oldRef);
+                if (oldPerson) {
+                    if (type === 'child' && oldPerson.children) {
+                        oldPerson.children = oldPerson.children.filter(cid => cid !== personId);
+                    }
+                    if (type === 'spouse' && oldPerson.spouseId === personId) {
+                        oldPerson.spouseId = "";
+                    }
+                }
+            }
+            if (newRef && oldRef !== newRef) {
+                const newPerson = getPerson(newRef);
+                if (newPerson) {
+                    if (type === 'child') {
+                        if (!newPerson.children) newPerson.children = [];
+                        if (!newPerson.children.includes(personId)) newPerson.children.push(personId);
+                    }
+                    if (type === 'spouse') {
+                        newPerson.spouseId = personId;
+                    }
+                }
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('formName').value.trim();
+            const fsId = document.getElementById('formFsId').value.trim().toUpperCase();
+            const birthDate = document.getElementById('formBirthDate').value.trim();
+            const birthPlace = document.getElementById('formBirthPlace').value.trim();
+            const deathDate = document.getElementById('formDeathDate').value.trim();
+            const deathPlace = document.getElementById('formDeathPlace').value.trim();
+
+            if (editingPersonId) {
+                const p = getPerson(editingPersonId);
+                if (p) {
+                    p.name = name; p.fsId = fsId; p.birthDate = birthDate; p.birthPlace = birthPlace; p.deathDate = deathDate; p.deathPlace = deathPlace;
+
+                    const newFather = document.getElementById('auditFather').value;
+                    const newMother = document.getElementById('auditMother').value;
+                    const newSpouse = document.getElementById('auditSpouse').value;
+
+                    syncInverseRelations(p.id, p.fatherId, newFather, 'child');
+                    syncInverseRelations(p.id, p.motherId, newMother, 'child');
+                    syncInverseRelations(p.id, p.spouseId, newSpouse, 'spouse');
+
+                    p.fatherId = newFather;
+                    p.motherId = newMother;
+                    p.spouseId = newSpouse;
+                }
+                exitEditMode();
+            } else {
+                const relType = document.getElementById('formRelationship').value;
+                const newId = 'custom_' + Date.now();
+                const focusPerson = getPerson(selectedPersonId);
+
+                const newPerson = { id: newId, name: name, fsId: fsId, birthDate: birthDate, birthPlace: birthPlace, deathDate: deathDate, deathPlace: deathPlace, fatherId: "", motherId: "", children: [] };
+
+                if (relType === 'father') {
+                    if(focusPerson.fatherId) { alert("Ya tiene un padre."); return; }
+                    focusPerson.fatherId = newId;
+                    newPerson.children = [focusPerson.id];
+                } else if (relType === 'mother') {
+                    if(focusPerson.motherId) { alert("Ya tiene una madre."); return; }
+                    focusPerson.motherId = newId;
+                    newPerson.children = [focusPerson.id];
+                } else if (relType === 'spouse') {
+                    if(focusPerson.spouseId) { alert("Ya tiene cónyuge."); return; }
+                    focusPerson.spouseId = newId;
+                    newPerson.spouseId = focusPerson.id;
+                } else if (relType === 'child_of_mother') {
+                    if(!focusPerson.children) focusPerson.children = [];
+                    focusPerson.children.push(newId);
+                    newPerson.motherId = focusPerson.id;
+                } else if (relType === 'child_of_father') {
+                    if(!focusPerson.children) focusPerson.children = [];
+                    focusPerson.children.push(newId);
+                    newPerson.fatherId = focusPerson.id;
+                }
+
+                people.push(newPerson);
+                document.getElementById('addRelativeForm').reset();
+            }
+
+            saveState();
+            updateUI();
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
