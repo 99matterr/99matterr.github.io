@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuadro Genealógico - Sistema de Auditoría y Exportación PDF</title>
-    <!-- Tailwind CSS for modern layout styling -->
+    <title>Gestor Genealógico Profesional - Árbol Gabriel Vásquez Herrera</title>
+    <!-- Tailwind CSS para el diseño de la interfaz -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- html2pdf.js dependency for client-side PDF rendering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         .tree-node {
             transition: all 0.2s ease-in-out;
@@ -15,6 +13,31 @@
         .tree-node:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Reglas de impresión nativa a PDF */
+        @media print {
+            @page {
+                size: letter landscape;
+                margin: 0.4in;
+            }
+            header, aside, #searchBar, #peopleList, .lg\:col-span-1, #addRelativeForm, #actionButtons, #formTitle, .bg-indigo-900, #treeManagerBlock, #backupBlock {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 12px;
+            }
+            main {
+                display: block !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .lg\:col-span-3 { width: 100% !important; display: block !important; }
+            #exportableWorkspace { background: white !important; padding: 0 !important; border: none !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
 </head>
@@ -24,15 +47,12 @@
     <header class="bg-indigo-900 text-white shadow-md p-4">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">Cuadro Genealógico Interactivo</h1>
-                <p class="text-xs text-indigo-200 mt-1">Módulo de Auditoría y Exportación Documental</p>
+                <h1 class="text-2xl font-bold tracking-tight">Plataforma Genealógica</h1>
+                <p class="text-xs text-indigo-200 mt-1">Historial Familiar de Gabriel Vasquez Herrera</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <button onclick="exportToPDF()" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm flex items-center gap-1">
-                    💾 Exportar a PDF
-                </button>
-                <button onclick="resetToDefault()" class="bg-indigo-700 hover:bg-indigo-600 px-3 py-1.5 rounded text-xs font-semibold transition">
-                    Restaurar Datos Originales
+                <button onclick="window.print();" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition shadow-sm cursor-pointer flex items-center gap-1">
+                    💾 Exportar Árbol Actual a PDF
                 </button>
             </div>
         </div>
@@ -41,25 +61,64 @@
     <!-- Main Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <!-- Left Sidebar: Directory List (Excluded from PDF) -->
-        <div class="lg:col-span-1 bg-white rounded-xl shadow-xs border border-slate-200 p-4 flex flex-col h-[600px] lg:h-auto">
-            <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Buscar Integrantes</h2>
-            <input type="text" id="searchBar" oninput="renderList()" placeholder="Filtrar por nombre o ID..." class="w-full p-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <!-- Left Sidebar: Tree Manager, Backups & Directory -->
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-xs border border-slate-200 p-4 flex flex-col gap-5 h-auto">
             
-            <div id="peopleList" class="flex-1 overflow-y-auto space-y-1 pr-1">
-                <!-- Populated by JS -->
+            <!-- GESTOR DE ÁRBOLES -->
+            <div id="treeManagerBlock" class="pb-4 border-b border-slate-100">
+                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Menú de Árboles</h2>
+                <div class="space-y-2">
+                    <select id="treeSelector" onchange="handleTreeSwitch(this.value)" class="w-full p-2 border border-slate-300 rounded-lg text-xs bg-slate-50 font-medium focus:ring-2 focus:ring-indigo-500">
+                        <!-- Populated dynamically by JS -->
+                    </select>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="createNewTree()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold py-1.5 px-2 rounded-md transition cursor-pointer text-center">
+                            ➕ Nuevo Árbol
+                        </button>
+                        <button onclick="resetToCleanDefault()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-[11px] font-bold py-1.5 px-2 rounded-md transition cursor-pointer text-center">
+                            🔄 Limpiar Caché
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SISTEMA DE COPIAS DE SEGURIDAD EXPORTABLES -->
+            <div id="backupBlock" class="pb-4 border-b border-slate-100 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <h2 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2 flex items-center gap-1">🛡️ Copias de Seguridad</h2>
+                <div class="space-y-1.5">
+                    <button onclick="exportBackup()" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold py-1.5 px-2 rounded-md transition cursor-pointer text-center block">
+                        📥 Descargar Respaldo (.json)
+                    </button>
+                    <label class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-[11px] font-bold py-1.5 px-2 rounded-md transition cursor-pointer text-center block">
+                        📤 Cargar Respaldo (.json)
+                        <input type="file" id="importFile" onchange="importBackup(event)" accept=".json" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Buscador de Integrantes -->
+            <div class="flex-1 flex flex-col min-h-[250px]">
+                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Buscar en este Árbol</h2>
+                <input type="text" id="searchBar" oninput="renderList()" placeholder="Filtrar por nombre..." class="w-full p-2 border border-slate-300 rounded-lg text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                
+                <div id="peopleList" class="flex-1 overflow-y-auto space-y-1 pr-1 max-h-[350px]">
+                    <!-- Populated by JS -->
+                </div>
             </div>
         </div>
 
-        <!-- Center & Right Panel: Tree View and Editor Split -->
+        <!-- Center & Right Panel -->
         <div class="lg:col-span-3 flex flex-col gap-6">
             
-            <!-- EXPORT TARGET: Everything wrapped inside this div will render in the PDF file cleanly -->
-            <div id="exportableWorkspace" class="space-y-6 bg-slate-50 p-2 rounded-xl">
+            <!-- Workspace Captura (PDF isolation area) -->
+            <div id="exportableWorkspace" class="space-y-6">
                 
-                <!-- Dynamic Pedigree Chart Component -->
+                <!-- Tree Chart -->
                 <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
-                    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">Vista del Árbol de Ascendencia</h2>
+                    <div class="flex justify-between items-center mb-6 print:mb-4">
+                        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Vista de Ascendencia</h2>
+                        <span id="treeBadge" class="bg-indigo-100 text-indigo-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full print:hidden">Árbol: Gabriel Vasquez Herrera</span>
+                    </div>
                     
                     <div class="grid grid-cols-3 gap-4 items-center relative">
                         <!-- Column 3: Grandparents -->
@@ -76,29 +135,28 @@
                             <div id="node-mother"></div>
                         </div>
 
-                        <!-- Column 1: Central Focused Person -->
+                        <!-- Column 1: Focus -->
                         <div class="col-start-1 row-start-1 flex flex-col justify-center h-full">
                             <div id="node-focus"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Profile Details Split Container -->
+                <!-- Profile Details -->
                 <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
                     <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Detalles del Familiar Seleccionado</h2>
                     <div id="personDetailCard" class="space-y-3">
                         <!-- Populated by JS -->
                     </div>
-                    <!-- Action buttons wrapper explicitly flagged to hide during automated PDF processing operations -->
-                    <div id="actionButtons" class="mt-6 pt-4 border-t border-slate-100 flex gap-2 data-html2pdf-ignore">
+                    <div id="actionButtons" class="mt-6 pt-4 border-t border-slate-100 flex gap-2">
                         <!-- Populated dynamically -->
                     </div>
                 </div>
 
             </div>
 
-            <!-- Interactive Add/Edit Form Panel (Excluded from PDF automatically) -->
-            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+            <!-- Form Panel -->
+            <div id="formContainer" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 print:hidden">
                 <h2 id="formTitle" class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Añadir Familiar Relacionado</h2>
                 <form id="addRelativeForm" onsubmit="handleFormSubmit(event)" class="space-y-3">
                     
@@ -113,7 +171,7 @@
                         </select>
                     </div>
 
-                    <!-- AUDIT GROUP: Hidden during creation, accessible via editing execution pathways -->
+                    <!-- AUDIT GROUP -->
                     <div id="relationshipAuditGroup" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2 mb-2">
                         <span class="text-[11px] font-bold tracking-wider text-amber-700 uppercase block">Auditoría de Vínculos Estructurales</span>
                         <div>
@@ -131,7 +189,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre Completo (Legal/Soltera)</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre Completo</label>
                         <input type="text" id="formName" required placeholder="Ej. Juan Perez" class="w-full p-2 border border-slate-300 rounded-md text-sm">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -160,10 +218,10 @@
                     </div>
                     
                     <div class="flex gap-2 mt-2">
-                        <button type="button" id="cancelEditBtn" onclick="exitEditMode()" class="hidden flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium p-2 rounded-md text-sm transition">
+                        <button type="button" id="cancelEditBtn" onclick="exitEditMode()" class="hidden flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium p-2 rounded-md text-sm transition cursor-pointer">
                             Cancelar
                         </button>
-                        <button type="submit" id="submitBtn" class="flex-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium p-2 rounded-md text-sm transition shadow-xs">
+                        <button type="submit" id="submitBtn" class="flex-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium p-2 rounded-md text-sm transition shadow-xs cursor-pointer">
                             Guardar y Vincular Familiar
                         </button>
                     </div>
@@ -175,10 +233,11 @@
 
     <!-- Core App State Engine -->
     <script>
-        // Foundational database loaded initially
-        const defaultPeople = [
-            { id: "1", name: "Carolina De Los Angeles Herrera Rodriguez", fsId: "GXJX-SRP", birthDate: "9 de noviembre de 1972", birthPlace: "Valencia, Carabobo, Venezuela", deathDate: "", deathPlace: "", marriageDate: "27 de julio de 1996", marriagePlace: "Valencia, Carabobo, Venezuela", spouseId: "spouse-1", fatherId: "2", motherId: "3", children: [] },
-            { id: "spouse-1", name: "José Gregorio Vasquez Cueva", fsId: "GXJX-WV", birthDate: "", birthPlace: "", deathDate: "", deathPlace: "", spouseId: "1", fatherId: "", motherId: "", children: [] },
+        // Datos duros extraídos directamente de tus documentos PDF
+        const initialGabrielTreeDataset = [
+            { id: "gabriel", name: "Gabriel Vasquez Herrera", fsId: "", birthDate: "", birthPlace: "", deathDate: "", deathPlace: "", fatherId: "jose", motherId: "1", children: [] },
+            { id: "1", name: "Carolina De Los Angeles Herrera Rodriguez", fsId: "GXJX-SRP", birthDate: "9 de noviembre de 1972", birthPlace: "Valencia, Carabobo, Venezuela", deathDate: "", deathPlace: "", marriageDate: "27 de julio de 1996", marriagePlace: "Valencia, Carabobo, Venezuela", spouseId: "jose", fatherId: "2", motherId: "3", children: ["gabriel"] },
+            { id: "jose", name: "José Gregorio Vasquez Cueva", fsId: "GXJX-WV", birthDate: "", birthPlace: "", deathDate: "", deathPlace: "", spouseId: "1", fatherId: "", motherId: "", children: ["gabriel"] },
             { id: "2", name: "Miguel Alfredo Herrera Ostos", fsId: "GXJX-HI", birthDate: "4 de junio de 1945", birthPlace: "Valencia, Carabobo, Venezuela", deathDate: "", deathPlace: "", marriageDate: "15 de agosto de 1970", marriagePlace: "Tocuyito, Libertador, Carabobo, Venezuela", fatherId: "4", motherId: "5", children: ["1"] },
             { id: "3", name: "Herminia Rafaela Rodríguez Díaz", fsId: "LLV", birthDate: "3 de julio de 1947", birthPlace: "Bejuma, Carabobo, Venezuela", deathDate: "27 de noviembre de 2015", deathPlace: "Carabobo, Venezuela", fatherId: "6", motherId: "7", children: ["1"] },
             { id: "4", name: "Francisco Joaquín Herrera", fsId: "GR5V-25Q", birthDate: "", birthPlace: "", deathDate: "", deathPlace: "", fatherId: "", motherId: "", children: ["2"] },
@@ -191,20 +250,118 @@
             { id: "15", name: "Maria de Lourdes Giran", fsId: "G6XB-YJW", birthDate: "", birthPlace: "Bejuma, Carabobo, Venezuela", deathDate: "", deathPlace: "", fatherId: "", motherId: "", children: ["7"] }
         ];
 
-        let people = JSON.parse(localStorage.getItem('interactive_family_tree')) || defaultPeople;
-        let selectedPersonId = "1";
+        // SISTEMA ANTICORRUPCIÓN: Validar y cargar de forma limpia omitiendo basura residual de caché
+        let allTrees = JSON.parse(localStorage.getItem('multi_family_trees_repo'));
+        
+        if (!allTrees || !allTrees["Gabriel Vasquez Herrera"] || allTrees["Gabriel Vasquez Herrera"].length <= 2) {
+            allTrees = {
+                "Gabriel Vasquez Herrera": JSON.parse(JSON.stringify(initialGabrielTreeDataset))
+            };
+            localStorage.setItem('multi_family_trees_repo', JSON.stringify(allTrees));
+        }
+
+        let currentTreeName = "Gabriel Vasquez Herrera";
+        let people = allTrees[currentTreeName];
+        let selectedPersonId = "gabriel";
         let editingPersonId = null;
 
         function saveState() {
-            localStorage.setItem('interactive_family_tree', JSON.stringify(people));
+            allTrees[currentTreeName] = people;
+            localStorage.setItem('multi_family_trees_repo', JSON.stringify(allTrees));
+            localStorage.setItem('active_tree_name', currentTreeName);
         }
 
-        function resetToDefault() {
-            if(confirm("¿Deseas restaurar los datos iniciales? Esto borrará adiciones personalizadas.")) {
-                people = JSON.parse(JSON.stringify(defaultPeople));
-                selectedPersonId = "1";
-                exitEditMode();
+        function resetToCleanDefault() {
+            if(confirm("¿Deseas vaciar la memoria caché vieja del navegador y restaurar el árbol limpio de Gabriel Vásquez?")) {
+                localStorage.clear();
+                allTrees = { "Gabriel Vasquez Herrera": JSON.parse(JSON.stringify(initialGabrielTreeDataset)) };
+                currentTreeName = "Gabriel Vasquez Herrera";
+                people = allTrees[currentTreeName];
+                selectedPersonId = "gabriel";
                 saveState();
+                exitEditMode();
+                renderTreeMenu();
+                updateUI();
+            }
+        }
+
+        function exportBackup() {
+            saveState();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allTrees, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            const fecha = new Date().toISOString().slice(0,10);
+            downloadAnchor.setAttribute("download", `respaldo_arboles_${fecha}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const parsedData = JSON.parse(event.target.result);
+                    if (typeof parsedData === 'object' && !Array.isArray(parsedData)) {
+                        allTrees = parsedData;
+                        currentTreeName = Object.keys(allTrees)[0];
+                        people = allTrees[currentTreeName];
+                        selectedPersonId = people[0].id;
+                        saveState();
+                        exitEditMode();
+                        renderTreeMenu();
+                        updateUI();
+                        alert("Respaldo cargado correctamente.");
+                    }
+                } catch (err) { alert("Archivo inválido."); }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        function renderTreeMenu() {
+            const selector = document.getElementById('treeSelector');
+            selector.innerHTML = '';
+            Object.keys(allTrees).forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name; opt.innerText = name;
+                if (name === currentTreeName) opt.selected = true;
+                selector.appendChild(opt);
+            });
+            document.getElementById('treeBadge').innerText = `Árbol: ${currentTreeName}`;
+        }
+
+        function handleTreeSwitch(name) {
+            saveState();
+            currentTreeName = name;
+            people = allTrees[currentTreeName];
+            selectedPersonId = people.find(p => p.id === "gabriel") ? "gabriel" : (people[0] ? people[0].id : "");
+            exitEditMode();
+            renderTreeMenu();
+            updateUI();
+        }
+
+        function createNewTree() {
+            let name = prompt("Nombre del nuevo árbol:");
+            if (!name) return;
+            name = name.trim();
+            if (allTrees[name]) { alert("Ya existe."); return; }
+            allTrees[name] = [{ id: "root", name: "Persona Raíz Nueva", fsId: "", birthDate: "", birthPlace: "", deathDate: "", deathPlace: "", fatherId: "", motherId: "", children: [] }];
+            handleTreeSwitch(name);
+        }
+
+        function deleteCurrentTree() {
+            if (Object.keys(allTrees).length <= 1) { alert("No puedes borrar tu único árbol."); return; }
+            if (confirm(`¿Borrar el árbol "${currentTreeName}"?`)) {
+                delete allTrees[currentTreeName];
+                currentTreeName = Object.keys(allTrees)[0];
+                people = allTrees[currentTreeName];
+                selectedPersonId = people[0].id;
+                saveState();
+                exitEditMode();
+                renderTreeMenu();
                 updateUI();
             }
         }
@@ -218,27 +375,6 @@
             selectedPersonId = id;
             exitEditMode();
             updateUI();
-        }
-
-        // Automated Document Generator Engine Routine
-        function exportToPDF() {
-            const currentPerson = getPerson(selectedPersonId);
-            const safeFileName = currentPerson ? `Arbol_${currentPerson.name.replace(/\s+/g, '_')}.pdf` : 'cuadro_genealogico.pdf';
-            
-            const targetElement = document.getElementById('exportableWorkspace');
-            
-            // Layout styling options tailored for clean vector generation results
-            const configOptions = {
-                margin:       0.4,
-                filename:     safeFileName,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, logging: false, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' },
-                pagebreak:    { mode: ['avoid-all'] }
-            };
-
-            // Run the compiler script pipeline
-            html2pdf().set(configOptions).from(targetElement).save();
         }
 
         function createNodeHTML(person, label) {
@@ -270,7 +406,7 @@
             const maternalGf = mother ? getPerson(mother.fatherId) : null;
             const maternalGm = mother ? getPerson(mother.motherId) : null;
 
-            document.getElementById('node-focus').innerHTML = createNodeHTML(current, 'Persona Central Focus');
+            document.getElementById('node-focus').innerHTML = createNodeHTML(current, 'Persona Enfocada');
             document.getElementById('node-father').innerHTML = createNodeHTML(father, 'Padre');
             document.getElementById('node-mother').innerHTML = createNodeHTML(mother, 'Madre');
             document.getElementById('node-paternal-gf').innerHTML = createNodeHTML(paternalGf, 'Abuelo Paterno');
@@ -311,7 +447,7 @@
                 detailsHTML += `
                     <hr class="border-slate-100">
                     <div class="text-xs">
-                        <span class="text-slate-400 block font-medium mb-1">Hijos/Descendientes</span>
+                        <span class="text-slate-400 block font-medium mb-1">Hijos / Descendientes</span>
                         <div class="space-y-1">
                             ${childrenList.map(child => `
                                 <div onclick="selectPerson('${child.id}')" class="bg-emerald-50 border border-emerald-100 rounded p-1.5 px-2 cursor-pointer hover:bg-emerald-100 text-emerald-900 font-medium text-xs">
@@ -325,12 +461,11 @@
 
             document.getElementById('personDetailCard').innerHTML = detailsHTML;
 
-            // Notice the custom directive data-html2pdf-ignore inside this container layout element block
             document.getElementById('actionButtons').innerHTML = `
-                <button onclick="enterEditMode('${current.id}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-3 rounded-md text-xs transition">
+                <button onclick="enterEditMode('${current.id}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-3 rounded-md text-xs transition cursor-pointer">
                     Editar Datos / Auditoría Relacional
                 </button>
-                <button onclick="deletePerson('${current.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium py-2 px-3 rounded-md text-xs transition">
+                <button onclick="deletePerson('${current.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium py-2 px-3 rounded-md text-xs transition cursor-pointer">
                     Eliminar
                 </button>
             `;
@@ -342,12 +477,11 @@
             const searchVal = document.getElementById('searchBar').value.toLowerCase();
             const container = document.getElementById('peopleList');
             container.innerHTML = '';
-
             people.filter(p => p.name.toLowerCase().includes(searchVal)).forEach(p => {
                 const isSelected = p.id === selectedPersonId;
                 const el = document.createElement('div');
                 el.className = `p-2 rounded-lg text-xs font-medium cursor-pointer transition ${isSelected ? 'bg-indigo-600 text-white' : 'hover:bg-slate-100 text-slate-700'}`;
-                el.innerHTML = `<div class="flex justify-between items-center"><span class="truncate">${p.name}</span></div>`;
+                el.innerHTML = `<span class="truncate">${p.name}</span>`;
                 el.onclick = () => selectPerson(p.id);
                 container.appendChild(el);
             });
@@ -356,12 +490,10 @@
         function populateAuditDropdown(dropdownId, currentValue, excludeId) {
             const dropdown = document.getElementById(dropdownId);
             dropdown.innerHTML = '<option value="">-- Ninguno (Desvincular) --</option>';
-            
             people.forEach(p => {
                 if (p.id !== excludeId) {
                     const opt = document.createElement('option');
-                    opt.value = p.id;
-                    opt.innerText = p.name;
+                    opt.value = p.id; opt.innerText = p.name;
                     if (p.id === currentValue) opt.selected = true;
                     dropdown.appendChild(opt);
                 }
@@ -371,15 +503,13 @@
         function enterEditMode(id) {
             const target = getPerson(id);
             if(!target) return;
-
             editingPersonId = id;
-            
-            document.getElementById('formTitle').innerText = `Auditoría e Historial de: ${target.name}`;
+            document.getElementById('formTitle').innerText = `Auditoría de: ${target.name}`;
             document.getElementById('submitBtn').innerText = "Aplicar Cambios Estructurales";
             document.getElementById('cancelEditBtn').classList.remove('hidden');
             document.getElementById('relationshipSelectorGroup').classList.add('hidden');
-            
             document.getElementById('relationshipAuditGroup').classList.remove('hidden');
+            
             populateAuditDropdown('auditFather', target.fatherId, id);
             populateAuditDropdown('auditMother', target.motherId, id);
             populateAuditDropdown('auditSpouse', target.spouseId, id);
@@ -390,6 +520,7 @@
             document.getElementById('formBirthPlace').value = target.birthPlace || '';
             document.getElementById('formDeathDate').value = target.deathDate || '';
             document.getElementById('formDeathPlace').value = target.deathPlace || '';
+            document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
         }
 
         function exitEditMode() {
@@ -424,12 +555,8 @@
             if (oldRef && oldRef !== newRef) {
                 const oldPerson = getPerson(oldRef);
                 if (oldPerson) {
-                    if (type === 'child' && oldPerson.children) {
-                        oldPerson.children = oldPerson.children.filter(cid => cid !== personId);
-                    }
-                    if (type === 'spouse' && oldPerson.spouseId === personId) {
-                        oldPerson.spouseId = "";
-                    }
+                    if (type === 'child' && oldPerson.children) oldPerson.children = oldPerson.children.filter(cid => cid !== personId);
+                    if (type === 'spouse' && oldPerson.spouseId === personId) oldPerson.spouseId = "";
                 }
             }
             if (newRef && oldRef !== newRef) {
@@ -439,16 +566,13 @@
                         if (!newPerson.children) newPerson.children = [];
                         if (!newPerson.children.includes(personId)) newPerson.children.push(personId);
                     }
-                    if (type === 'spouse') {
-                        newPerson.spouseId = personId;
-                    }
+                    if (type === 'spouse') newPerson.spouseId = personId;
                 }
             }
         }
 
         function handleFormSubmit(e) {
             e.preventDefault();
-
             const name = document.getElementById('formName').value.trim();
             const fsId = document.getElementById('formFsId').value.trim().toUpperCase();
             const birthDate = document.getElementById('formBirthDate').value.trim();
@@ -460,7 +584,6 @@
                 const p = getPerson(editingPersonId);
                 if (p) {
                     p.name = name; p.fsId = fsId; p.birthDate = birthDate; p.birthPlace = birthPlace; p.deathDate = deathDate; p.deathPlace = deathPlace;
-
                     const newFather = document.getElementById('auditFather').value;
                     const newMother = document.getElementById('auditMother').value;
                     const newSpouse = document.getElementById('auditSpouse').value;
@@ -469,48 +592,39 @@
                     syncInverseRelations(p.id, p.motherId, newMother, 'child');
                     syncInverseRelations(p.id, p.spouseId, newSpouse, 'spouse');
 
-                    p.fatherId = newFather;
-                    p.motherId = newMother;
-                    p.spouseId = newSpouse;
+                    p.fatherId = newFather; p.motherId = newMother; p.spouseId = newSpouse;
                 }
                 exitEditMode();
             } else {
                 const relType = document.getElementById('formRelationship').value;
                 const newId = 'custom_' + Date.now();
                 const focusPerson = getPerson(selectedPersonId);
-
                 const newPerson = { id: newId, name: name, fsId: fsId, birthDate: birthDate, birthPlace: birthPlace, deathDate: deathDate, deathPlace: deathPlace, fatherId: "", motherId: "", children: [] };
 
                 if (relType === 'father') {
-                    if(focusPerson.fatherId) { alert("Ya tiene un padre."); return; }
-                    focusPerson.fatherId = newId;
-                    newPerson.children = [focusPerson.id];
+                    if(focusPerson.fatherId) { alert("Ya tiene padre."); return; }
+                    focusPerson.fatherId = newId; newPerson.children = [focusPerson.id];
                 } else if (relType === 'mother') {
-                    if(focusPerson.motherId) { alert("Ya tiene una madre."); return; }
-                    focusPerson.motherId = newId;
-                    newPerson.children = [focusPerson.id];
+                    if(focusPerson.motherId) { alert("Ya tiene madre."); return; }
+                    focusPerson.motherId = newId; newPerson.children = [focusPerson.id];
                 } else if (relType === 'spouse') {
                     if(focusPerson.spouseId) { alert("Ya tiene cónyuge."); return; }
-                    focusPerson.spouseId = newId;
-                    newPerson.spouseId = focusPerson.id;
+                    focusPerson.spouseId = newId; newPerson.spouseId = focusPerson.id;
                 } else if (relType === 'child_of_mother') {
                     if(!focusPerson.children) focusPerson.children = [];
-                    focusPerson.children.push(newId);
-                    newPerson.motherId = focusPerson.id;
+                    focusPerson.children.push(newId); newPerson.motherId = focusPerson.id;
                 } else if (relType === 'child_of_father') {
                     if(!focusPerson.children) focusPerson.children = [];
-                    focusPerson.children.push(newId);
-                    newPerson.fatherId = focusPerson.id;
+                    focusPerson.children.push(newId); newPerson.fatherId = focusPerson.id;
                 }
-
                 people.push(newPerson);
                 document.getElementById('addRelativeForm').reset();
             }
-
             saveState();
             updateUI();
         }
 
+        renderTreeMenu();
         updateUI();
     </script>
 </body>
